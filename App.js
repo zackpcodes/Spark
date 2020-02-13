@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, Button, Alert, TextInput, TouchableOpacity, Image } from 'react-native';
+import { Text, View, stylesForRegheet, Button, Alert, TextInput, TouchableOpacity, Image, FLatList, StyleSheet} from 'react-native';
 import Constants from 'expo-constants';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { KeyboardAvoidingView } from 'react-native';
-
+import * as ImagePicker from 'expo-image-picker';
+import { ScrollView, FlatList } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Modal from 'react-native-modalbox';
 
 // EmailVeri: Ask's users to enter their email and a request is sent
 // to api on server for verification code.
@@ -19,7 +22,7 @@ class EmailVeri extends Component {
   }
 
   
-  validate = (text) => {
+  validateEmail = (text) => {
     console.log(text);
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (reg.test(text) === false) {
@@ -37,7 +40,7 @@ class EmailVeri extends Component {
 
     // Make api call here to send user entered email to server
 
-    if(this.validate(this.state.email)){
+    if(this.validateEmail(this.state.email)){
       this.props.navigation.navigate('Veri')
     }else{
       alert("Please enter a valid email address")
@@ -46,22 +49,22 @@ class EmailVeri extends Component {
 
   render() {
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+      <KeyboardAvoidingView style={stylesForReg.container} behavior="padding" enabled>
 
-        <View style={styles.container}>
+        <View style={stylesForReg.container}>
           <Image
             style={{ width: 210, height: 210, marginLeft: 20, }}
             source={require('./MainLogo.png')}
           />
           <Text style={{ marginBottom: 160, fontSize: 55, textAlign: 'center', fontFamily: 'sans-serif-thin', }}>SPARK</Text>
           <TextInput
-            style={styles.textIn}
+            style={stylesForReg.textIn}
             placeholder={this.state.placeHolderText}
             onChangeText={(email) => this.setState({ email })}
             value={this.state.email}
           />
 
-          <TouchableOpacity style={styles.touchButton} onPress={() => this.emailVeriRequest()}>
+          <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.emailVeriRequest()}>
             <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
           </TouchableOpacity>
         </View>
@@ -92,8 +95,8 @@ class VeriScreen extends Component {
 
   render() {
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-        <View style={styles.container}>
+      <KeyboardAvoidingView style={stylesForReg.container} behavior="padding" enabled>
+        <View style={stylesForReg.container}>
           <Image
             style={{ width: 210, height: 210, marginLeft: 20, }}
             source={require('./MainLogo.png')}
@@ -102,13 +105,13 @@ class VeriScreen extends Component {
           <Text style={{ marginBottom: 160, fontSize: 55, textAlign: 'center', fontFamily: 'sans-serif-thin', }}>SPARK</Text>
 
           <TextInput
-            style={styles.textIn}
+            style={stylesForReg.textIn}
             placeholder={this.state.placeHolderText}
             onChangeText={(veriCode) => this.setState({ veriCode })}
             value={this.state.veriCode}
           />
 
-          <TouchableOpacity style={styles.touchButton} onPress={() => this.codeVeriRequest()}>
+          <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.codeVeriRequest()}>
             <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
           </TouchableOpacity>
         </View>
@@ -123,10 +126,11 @@ class ProfileSetup extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      veriCode: '',
+      image: null,
+      organizationText: '',
+      usernameText: '',
       placeHolderOrganization: 'Organization',
       placeHolderUsername: "Username",
-
       btnText: 'Done'
     };
   }
@@ -134,50 +138,197 @@ class ProfileSetup extends Component {
   profilePush = () => {
     // Make api call here to push profile data to server
     //this.props.navigation.navigate('Veri')
+    this.props.navigation.navigate('Convos')
   }
 
   render() {
+    let { image } = this.state;
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-        <View style={styles.container}>
+      <KeyboardAvoidingView style={stylesForReg.container} behavior="padding" enabled>
+        <View style={stylesForReg.container}>
 
-          <TouchableOpacity style={styles.profilePicSelection} onPress={() => this.profilePush()}>
-            <Image
-              style={{ width: 50, height: 50, marginLeft: 58, marginTop: 60 }}
-              source={require('./AddProfilePicture.png')}
-            />
+          <TouchableOpacity onPress={this._pickImage}>
+            <Image source={{ uri: image }} style={stylesForReg.profilePicSelection} />
           </TouchableOpacity>
 
           <TextInput
-            style={styles.textIn}
+            style={stylesForReg.textIn}
             placeholder={this.state.placeHolderOrganization}
-            onChangeText={(veriCode) => this.setState({ veriCode })}
-            value={this.state.veriCode}
+            onChangeText={(organizationText) => this.setState({ organizationText })}
+            value={this.state.organizationText}
           />
           <TextInput
-            style={styles.textIn}
+            style={stylesForReg.textIn}
             placeholder={this.state.placeHolderUsername}
-            onChangeText={(veriCode) => this.setState({ veriCode })}
+            onChangeText={(usernameText) => this.setState({ usernameText })}
             value={this.state.veriCode}
           />
 
-          <TouchableOpacity style={styles.touchButton} onPress={() => this.profilePush()}>
+          <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.profilePush()}>
             <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     );
   }
+
+  componentDidMount() {
+    this.getPermissionAsync();
+    console.log('hi');
+  }
+
+  getPermissionAsync = async () => {
+    if (Constants.platform.ios) {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if (status !== 'granted') {
+        alert('Sorry, we need camera roll permissions to make this work!');
+      }
+    }
+  }
+
+  _pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      this.setState({ image: result.uri });
+    }
+  };
 }
 
 
-const styles = StyleSheet.create({
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+
+function ConvoCard({title}) {
+  return(
+    <TouchableOpacity style={stylesForConvos.convoCard}>
+      <TouchableOpacity onPress={null}>
+              <Image source={null} style={stylesForConvos.recipientProfileBtn} />
+            </TouchableOpacity>
+      <Text style={{ fontSize: 19, padding: 25 }}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function ContactCard({title}) {
+  return(
+    <TouchableOpacity style={stylesForConvos.convoCard}>
+      <TouchableOpacity onPress={null}>
+              <Image source={null} style={stylesForConvos.recipientProfileBtn} />
+      </TouchableOpacity>
+      <Text style={{ fontSize: 19, width: '100%', padding: 25, }}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
+
+
+
+class ConvosFeed extends Component {
+  constructor(props) {
+    super(props);
+    this.convoArray = []
+
+    this.state = {
+      CONVOS: []
+    };
+  }
+
+
+
+  startConvo = () => {
+    this.refs.modal2.open()
+    this.convoArray.push({id: uuidv4(), title: 'zack'})
+
+    this.setState({ CONVOS: [...this.convoArray] })
+  }
+
+  
+  render() {
+    return (
+
+      
+
+
+      <SafeAreaView>
+        <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false}  position={"top"} ref={"modal2"}>
+          <View>
+            <Text style={{fontSize: 25, padding: 10,}}>Contacts</Text>
+          </View>
+          <View style={stylesForConvos.contactsList}>
+            <FlatList
+              data = {this.state.CONVOS}
+              renderItem={({item}) => <ContactCard title={item.title}/>}
+              keyExtractor={item => item.id}
+            />
+          </View>
+          <View style={{width: '100%',}}>
+            <TouchableOpacity onPress={this.startConvo} style={{backgroundColor: '#1985a1', alignItems: 'center', borderBottomStartRadius: 15, borderBottomEndRadius: 15,}}>
+              <Text style={{ fontSize: 18, padding: 17,}}>SPARK</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        
+        <View style={stylesForConvos.convoScreen}>
+          <View style={{alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
+            <TouchableOpacity onPress={null}>
+              <Image source={null} style={stylesForConvos.profileMenuButton} />
+            </TouchableOpacity>
+              
+              <Image
+            style={{ width: 40, height: 40, }}
+            source={require('./MainLogo.png')}
+            />
+           
+            <TouchableOpacity onPress={null} style={{alignContent: 'center'}}>
+              <Image
+              style={{ width: 40, height: 40, }}
+              source={require('./SettingsBtn.png')}
+            />
+            </TouchableOpacity>
+          </View>
+          <View style={stylesForConvos.convoList}>
+            <FlatList
+              data = {this.state.CONVOS}
+              renderItem={({item}) => <ConvoCard title={item.title}/>}
+              keyExtractor={item => item.id}
+            
+            />
+          </View>
+          <View style={stylesForConvos.startConvoButton}>
+            <TouchableOpacity onPress={this.startConvo}>
+              <Text style={{ fontSize: 18, padding: 17 }}>SPARK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+}
+
+
+
+// Styles for registration screens
+const stylesForReg = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Constants.statusBarHeight,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#dcdcdd'
+    backgroundColor: '#dcdcdd',
+    justifyContent: 'center'
   },
   textIn: {
     textAlign: 'center',
@@ -202,23 +353,92 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   profilePicSelection: {
-    width: 175,
-    height: 175,
+    width: 200,
+    height: 200,
     borderRadius: 100,
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: '#1985a1',
-    marginBottom: 150,
+    marginBottom: 160,
   },
 });
 
-// Following code creates and enables the default page upon loading the app
+// Styles for convo screens
+const stylesForConvos = StyleSheet.create({
+  convoCard: {
+    backgroundColor: 'white',
+    borderBottomColor: '#46494c',
+    borderBottomWidth: .3,
+    flexDirection: 'row',
+  },
+  startConvoButton: {
+    position: 'absolute',
+    alignItems: 'center',
+    backgroundColor: '#1985a1',
+    width: '25%',
+    height: 65,
+    opacity: 0.7,
+    bottom: 20,
+    right: 20,
+    borderRadius: 100,
+    elevation: 1,
+    alignSelf: 'flex-end'
+  },
+  convoList: {
+    backgroundColor: 'white',
+    height:'100%',
+    justifyContent: 'space-around',
+    flex: 1,
+  },
+  convoScreen: {
+    height: "100%",
+   
+  },
+  profileMenuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: '#1985a1',
+    left: 5,
+  },
+  recipientProfileBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: '#46494c',
+    margin: 20,
+    marginRight: 5,
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modal2: {
+    marginTop: 80,
+    height: '67%',
+    width: '90%',
+    backgroundColor: "white",
+    borderRadius: 15,
+    borderColor: '#46494c',
+    borderWidth: .5,
+  },
+  contactsList: {
+    backgroundColor: 'white',
+    flex: 1,
+  },
+
+});
+
+// Creates pages within the navigator
 const MainNavigator = createStackNavigator({
   Email: { screen: EmailVeri, navigationOptions: { headerShown: false } },
   Veri: { screen: VeriScreen, navigationOptions: { headerShown: false } },
   ProfileSetup: { screen: ProfileSetup, navigationOptions: { headerShown: false } },
+  Convos: { screen: ConvosFeed, navigationOptions: { headerShown: false } },
+  
 });
 
 const App = createAppContainer(MainNavigator);
-
 
 export default App;
