@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { ScrollView, FlatList } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Modal from 'react-native-modalbox';
+import { SearchBar } from 'react-native-elements';
 
 // EmailVeri: Ask's users to enter their email and a request is sent
 // to api on server for verification code.
@@ -120,13 +121,17 @@ class VeriScreen extends Component {
   }
 }
 
+
+var userProfilepic = null
+
+
 // ProfileSetup: Allows the user to set up a profile then makes 
 // a call to the server to push profile data.
 class ProfileSetup extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      image: null,
+      image: userProfilepic,
       organizationText: '',
       usernameText: '',
       placeHolderOrganization: 'Organization',
@@ -137,7 +142,6 @@ class ProfileSetup extends Component {
 
   profilePush = () => {
     // Make api call here to push profile data to server
-    //this.props.navigation.navigate('Veri')
     this.props.navigation.navigate('Convos')
   }
 
@@ -198,6 +202,7 @@ class ProfileSetup extends Component {
 
     if (!result.cancelled) {
       this.setState({ image: result.uri });
+      userProfilepic = result.uri
     }
   };
 }
@@ -225,7 +230,7 @@ function ConvoCard({title}) {
 
 function ContactCard({title}) {
   return(
-    <TouchableOpacity style={stylesForConvos.convoCard}>
+    <TouchableOpacity style={stylesForConvos.convoCard} onPress={() => conversation(title)}>
       <TouchableOpacity onPress={null}>
               <Image source={null} style={stylesForConvos.recipientProfileBtn} />
       </TouchableOpacity>
@@ -234,70 +239,93 @@ function ContactCard({title}) {
   );
 }
 
+var convoDict = []
+
+function conversation(title) {
+  convoDict.push({convoId: uuidv4(), title: title, messages: []})
+}
 
 
 class ConvosFeed extends Component {
   constructor(props) {
     super(props);
-    this.convoArray = []
 
     this.state = {
-      CONVOS: []
+      CONVOS: [],
+      CONTACTS: [],
+      contactsOrigin: [],
+      search: '',
     };
   }
 
 
+  updateSearch = text => {
+    const searchData = this.state.contactsOrigin.filter(item => {      
+      const itemData = item.title.toUpperCase();
+      const textData = text.toUpperCase();  
+      return itemData.indexOf(textData) > -1;    
+    });
+    
+    this.setState({ CONTACTS: searchData });  
+  };
 
-  startConvo = () => {
+
+  openContacts = () => {
+    this.updateSearch('')
+    if(this.state.contactsOrigin.length == 0){
+      //Test contacts below
+      this.state.contactsOrigin.push({contactId: uuidv4(), title: 'zack'})
+      this.state.contactsOrigin.push({contactId: uuidv4(), title: 'corwin'})
+      this.state.contactsOrigin.push({contactId: uuidv4(), title: 'brad'})
+      this.state.contactsOrigin.push({contactId: uuidv4(), title: 'connor'})
+      this.state.contactsOrigin.push({contactId: uuidv4(), title: 'von'})
+      this.state.contactsOrigin.push({contactId: uuidv4(), title: 'patrick'})
+      this.setState({CONTACTS: this.state.contactsOrigin})
+    }
     this.refs.modal2.open()
-    this.convoArray.push({id: uuidv4(), title: 'zack'})
-
-    this.setState({ CONVOS: [...this.convoArray] })
-  }
+  };
 
   
   render() {
     return (
 
-      
-
-
       <SafeAreaView>
         <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false}  position={"top"} ref={"modal2"}>
           <View>
-            <Text style={{fontSize: 25, padding: 10,}}>Contacts</Text>
+            <Text style={{padding: 20, fontSize: 20,}}>New Conversation</Text>
+          </View>
+          <View style={{width: '100%',}}>
+            <TextInput
+              style={{ height: 50, borderColor: 'gray', borderWidth: .2, textAlign: "center", fontSize: 15, borderRadius: 10, }}
+              onChangeText={text => this.updateSearch(text)}
+              placeholder='Find Contact...'
+            />
           </View>
           <View style={stylesForConvos.contactsList}>
             <FlatList
-              data = {this.state.CONVOS}
+              data = {this.state.CONTACTS}
               renderItem={({item}) => <ContactCard title={item.title}/>}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item.contactId}
             />
           </View>
-          <View style={{width: '100%',}}>
-            <TouchableOpacity onPress={this.startConvo} style={{backgroundColor: '#1985a1', alignItems: 'center', borderBottomStartRadius: 15, borderBottomEndRadius: 15,}}>
-              <Text style={{ fontSize: 18, padding: 17,}}>SPARK</Text>
-            </TouchableOpacity>
-          </View>
         </Modal>
-
         
         <View style={stylesForConvos.convoScreen}>
           <View style={{alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
             <TouchableOpacity onPress={null}>
-              <Image source={null} style={stylesForConvos.profileMenuButton} />
+              <Image source={{uri: userProfilepic}} style={stylesForConvos.profileMenuButton} />
             </TouchableOpacity>
               
               <Image
-            style={{ width: 40, height: 40, }}
-            source={require('./MainLogo.png')}
-            />
+                style={{ width: 40, height: 40, }}
+                source={require('./MainLogo.png')}
+              />
            
             <TouchableOpacity onPress={null} style={{alignContent: 'center'}}>
               <Image
-              style={{ width: 40, height: 40, }}
-              source={require('./SettingsBtn.png')}
-            />
+                style={{ width: 40, height: 40, }}
+                source={require('./SettingsBtn.png')}
+              />
             </TouchableOpacity>
           </View>
           <View style={stylesForConvos.convoList}>
@@ -305,12 +333,11 @@ class ConvosFeed extends Component {
               data = {this.state.CONVOS}
               renderItem={({item}) => <ConvoCard title={item.title}/>}
               keyExtractor={item => item.id}
-            
             />
           </View>
           <View style={stylesForConvos.startConvoButton}>
-            <TouchableOpacity onPress={this.startConvo}>
-              <Text style={{ fontSize: 18, padding: 17 }}>SPARK</Text>
+            <TouchableOpacity onPress={this.openContacts}>
+              <Text style={{ fontSize: 35, paddingTop: 7,}}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -318,8 +345,6 @@ class ConvosFeed extends Component {
     );
   }
 }
-
-
 
 // Styles for registration screens
 const stylesForReg = StyleSheet.create({
@@ -362,25 +387,25 @@ const stylesForReg = StyleSheet.create({
   },
 });
 
+
 // Styles for convo screens
 const stylesForConvos = StyleSheet.create({
   convoCard: {
     backgroundColor: 'white',
     borderBottomColor: '#46494c',
-    borderBottomWidth: .3,
+    borderBottomWidth: .5,
     flexDirection: 'row',
   },
   startConvoButton: {
     position: 'absolute',
     alignItems: 'center',
     backgroundColor: '#1985a1',
-    width: '25%',
-    height: 65,
-    opacity: 0.7,
+    width: 70,
+    height: 70,
     bottom: 20,
     right: 20,
     borderRadius: 100,
-    elevation: 1,
+
     alignSelf: 'flex-end'
   },
   convoList: {
@@ -415,11 +440,9 @@ const stylesForConvos = StyleSheet.create({
     alignItems: 'center',
   },
   modal2: {
-    marginTop: 80,
-    height: '67%',
-    width: '90%',
+    marginTop: 70,
+    width: '100%',
     backgroundColor: "white",
-    borderRadius: 15,
     borderColor: '#46494c',
     borderWidth: .5,
   },
@@ -429,6 +452,7 @@ const stylesForConvos = StyleSheet.create({
   },
 
 });
+
 
 // Creates pages within the navigator
 const MainNavigator = createStackNavigator({
