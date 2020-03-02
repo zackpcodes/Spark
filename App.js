@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
-import { Text, View, stylesForRegheet, Button, Alert, TextInput, TouchableOpacity, Image, FLatList, StyleSheet} from 'react-native';
+import { Text, View, stylesForRegheet, Button, Alert, TextInput, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import Constants from 'expo-constants';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { KeyboardAvoidingView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { ScrollView, FlatList } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Modal from 'react-native-modalbox';
-import { SearchBar } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
+import { GiftedChat } from 'react-native-gifted-chat';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 // EmailVeri: Ask's users to enter their email and a request is sent
 // to api on server for verification code.
@@ -121,7 +123,7 @@ class VeriScreen extends Component {
   }
 }
 
-
+// NON-Sensitive user data.
 var userProfilepic = null
 
 
@@ -217,41 +219,16 @@ function uuidv4() {
 }
 
 
-function ConvoCard({title}) {
-  return(
-    <TouchableOpacity style={stylesForConvos.convoCard}>
-      <TouchableOpacity onPress={null}>
-              <Image source={null} style={stylesForConvos.recipientProfileBtn} />
-            </TouchableOpacity>
-      <Text style={{ fontSize: 19, padding: 25 }}>{title}</Text>
-    </TouchableOpacity>
-  );
-}
-
-function ContactCard({title}) {
-  return(
-    <TouchableOpacity style={stylesForConvos.convoCard} onPress={() => conversation(title)}>
-      <TouchableOpacity onPress={null}>
-              <Image source={null} style={stylesForConvos.recipientProfileBtn} />
-      </TouchableOpacity>
-      <Text style={{ fontSize: 19, width: '100%', padding: 25, }}>{title}</Text>
-    </TouchableOpacity>
-  );
-}
-
-var convoDict = []
-
-function conversation(title) {
-  convoDict.push({convoId: uuidv4(), title: title, messages: []})
-}
-
+//load messages with api into this array and load data based on uuid into each converstation screen
+var converstaions = []
+var curConversation = null
 
 class ConvosFeed extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      CONVOS: [],
+      CONVOS: converstaions,
       CONTACTS: [],
       contactsOrigin: [],
       search: '',
@@ -285,6 +262,18 @@ class ConvosFeed extends Component {
     this.refs.modal2.open()
   };
 
+  startConvo = title => {
+    converstaions.push({convoId: uuidv4(), title: title, messages: []})
+    this.setState(this.state)
+    this.refs.modal2.close()
+  };
+
+  openChat = convoId => {
+    curConversation = convoId
+    this.props.navigation.navigate('IndividualConvo')
+  };
+
+
   
   render() {
     return (
@@ -304,12 +293,22 @@ class ConvosFeed extends Component {
           <View style={stylesForConvos.contactsList}>
             <FlatList
               data = {this.state.CONTACTS}
-              renderItem={({item}) => <ContactCard title={item.title}/>}
+              renderItem={({item}) => (
+                <ListItem              
+                  roundAvatar              
+                  title={item.title}  
+                  subtitle={"Email@gmail.com"}                           
+                  avatar={{ uri: userProfilepic }}   
+                  onPress={() => {this.startConvo(item.title)}}
+                  bottomDivider
+                  />
+              )}
               keyExtractor={item => item.contactId}
             />
           </View>
         </Modal>
         
+
         <View style={stylesForConvos.convoScreen}>
           <View style={{alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
             <TouchableOpacity onPress={null}>
@@ -329,9 +328,20 @@ class ConvosFeed extends Component {
             </TouchableOpacity>
           </View>
           <View style={stylesForConvos.convoList}>
-            <FlatList
+          <FlatList
               data = {this.state.CONVOS}
-              renderItem={({item}) => <ConvoCard title={item.title}/>}
+              renderItem={({item}) => (
+                <ListItem              
+                  roundAvatar              
+                  title={item.title}  
+                  subtitle={"Email@gmail.com"}                           
+                  avatar={{userProfilepic}}
+                  bottomDivider   
+                  containerStyle={{ borderBottomWidth: 0 }} 
+                  onPress={() => {this.openChat(item.convoId)}}
+                  chevron
+                  />
+              )}
               keyExtractor={item => item.id}
             />
           </View>
@@ -342,6 +352,55 @@ class ConvosFeed extends Component {
           </View>
         </View>
       </SafeAreaView>
+    );
+  }
+}
+
+class Conversation extends Component {
+  state = {
+    messages: [],
+  }
+
+  componentDidMount() {
+    this.setState({
+      messages: [
+        {
+          _id: 1,
+          text: 'Hello developer',
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://placeimg.com/140/140/any',
+          },
+        },
+      ],
+    })
+  }
+
+  onSend(messages = []) {
+    this.setState(previousState => ({
+      messages: GiftedChat.append(previousState.messages, messages),
+    }))
+  }
+
+  render() {
+    return (
+        <View style={{flex: 1,}}>
+          <View style={{marginTop: Constants.statusBarHeight, }}>
+            <Text>Back</Text>
+          </View>
+          <GiftedChat
+          messages={this.state.messages}
+          onSend={messages => this.onSend(messages)}
+          user={{
+          _id: 1,
+          }}
+          
+        />
+        {Platform.OS === 'android' ? <KeyboardSpacer style={{marginBottom: 40}} /> : null }
+        </View>
+      
     );
   }
 }
@@ -390,12 +449,7 @@ const stylesForReg = StyleSheet.create({
 
 // Styles for convo screens
 const stylesForConvos = StyleSheet.create({
-  convoCard: {
-    backgroundColor: 'white',
-    borderBottomColor: '#46494c',
-    borderBottomWidth: .5,
-    flexDirection: 'row',
-  },
+  
   startConvoButton: {
     position: 'absolute',
     alignItems: 'center',
@@ -448,6 +502,7 @@ const stylesForConvos = StyleSheet.create({
   },
   contactsList: {
     backgroundColor: 'white',
+    width: "100%",
     flex: 1,
   },
 
@@ -455,11 +510,12 @@ const stylesForConvos = StyleSheet.create({
 
 
 // Creates pages within the navigator
-const MainNavigator = createStackNavigator({
+const MainNavigator = createStackNavigator({Convos: { screen: ConvosFeed, navigationOptions: { headerShown: false } },
   Email: { screen: EmailVeri, navigationOptions: { headerShown: false } },
   Veri: { screen: VeriScreen, navigationOptions: { headerShown: false } },
   ProfileSetup: { screen: ProfileSetup, navigationOptions: { headerShown: false } },
-  Convos: { screen: ConvosFeed, navigationOptions: { headerShown: false } },
+  IndividualConvo: { screen: Conversation, navigationOptions: { headerShown: false }},
+  
   
 });
 
