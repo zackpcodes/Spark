@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { FlatList } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Modal from 'react-native-modalbox';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Divider } from 'react-native-elements';
 import { GiftedChat } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 
@@ -268,8 +268,8 @@ class ConvosFeed extends Component {
     this.refs.modal2.close()
   };
 
-  openChat = convoId => {
-    curConversation = convoId
+  openChat = item => {
+    curConversation = item
     this.props.navigation.navigate('IndividualConvo')
   };
 
@@ -298,7 +298,7 @@ class ConvosFeed extends Component {
                   roundAvatar              
                   title={item.title}  
                   subtitle={"Email@gmail.com"}                           
-                  avatar={{ uri: userProfilepic }}   
+                  leftAvatar={{source: {uri: 'https://placeimg.com/140/140/any'}}}
                   onPress={() => {this.startConvo(item.title)}}
                   bottomDivider
                   />
@@ -331,16 +331,19 @@ class ConvosFeed extends Component {
           <FlatList
               data = {this.state.CONVOS}
               renderItem={({item}) => (
+                <View>
                 <ListItem              
                   roundAvatar              
                   title={item.title}  
                   subtitle={"Email@gmail.com"}                           
-                  avatar={{userProfilepic}}
-                  bottomDivider   
+                  leftAvatar={{source: {uri: 'https://placeimg.com/140/140/any'}}}
                   containerStyle={{ borderBottomWidth: 0 }} 
-                  onPress={() => {this.openChat(item.convoId)}}
+                  onPress={() => {this.openChat(item)}}
                   chevron
+                  bottomDivider 
                   />
+                  <Divider style={{backgroundColor: 'black'}}/>
+                  </View>
               )}
               keyExtractor={item => item.id}
             />
@@ -359,6 +362,7 @@ class ConvosFeed extends Component {
 class Conversation extends Component {
   state = {
     messages: [],
+    title: 'Convo Title'
   }
 
   componentDidMount() {
@@ -375,6 +379,7 @@ class Conversation extends Component {
           },
         },
       ],
+      title: curConversation.title
     })
   }
 
@@ -384,20 +389,40 @@ class Conversation extends Component {
     }))
   }
 
+  backToConvos = () =>{
+    curConversation = null
+    this.props.navigation.navigate('Convos')
+  }
+
   render() {
     return (
         <View style={{flex: 1,}}>
-          <View style={{marginTop: Constants.statusBarHeight, }}>
-            <Text>Back</Text>
+          <View style={{alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row', marginTop: Constants.statusBarHeight,}}>
+            <TouchableOpacity onPress={this.backToConvos} style={{alignContent: 'center', marginLeft: 10,}}>
+              <Text style={{fontSize: 30, fontWeight: 'bold', color: '#1985a1'}}>&lt;</Text>
+            </TouchableOpacity>
+
+            <Text style={{fontSize: 20, fontWeight: 'bold', color: '#1985a1', marginLeft:13}}>{this.state.title}</Text>
+
+            <TouchableOpacity onPress={null} style={{alignContent: 'center'}}>
+              <Image
+                style={{ width: 40, height: 40, }}
+                source={require('./SettingsBtn.png')}
+              />
+            </TouchableOpacity>
+            
           </View>
-          <GiftedChat
-          messages={this.state.messages}
-          onSend={messages => this.onSend(messages)}
-          user={{
-          _id: 1,
-          }}
+
+          <Divider style={{backgroundColor: 'black'}}/>
           
-        />
+          <GiftedChat
+            messages={this.state.messages}
+            onSend={messages => this.onSend(messages)}
+            user={{
+            _id: 1,
+            }}
+          />
+
         {Platform.OS === 'android' ? <KeyboardSpacer style={{marginBottom: 40}} /> : null }
         </View>
       
