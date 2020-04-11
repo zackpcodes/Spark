@@ -11,12 +11,11 @@ import VeriScreen from './Screens/VeriScreen';
 
 // Creates pages within the navigator
 const MainNavigator = createStackNavigator({
-  Convos: { screen: ConvosFeed, navigationOptions: { headerShown: false } },
   Email: { screen: EmailVeri, navigationOptions: { headerShown: false } },
   Veri: { screen: VeriScreen, navigationOptions: { headerShown: false } },
   ProfileSetup: { screen: ProfileSetup, navigationOptions: { headerShown: false } },
   IndividualConvo: { screen: Conversation, navigationOptions: { headerShown: false }},
-  
+  Convos: { screen: ConvosFeed, navigationOptions: { headerShown: false } },
   
 });
 

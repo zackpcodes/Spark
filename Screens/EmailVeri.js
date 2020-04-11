@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, Image} from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Image, Alert} from 'react-native';
 import { KeyboardAvoidingView } from 'react-native';
 
 import './styles';
@@ -32,29 +32,37 @@ export default class EmailVeri extends Component {
   
   
     emailVeriRequest = () => {
-  
-      if(this.validateEmail(this.state.email)){
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            console.log(this.responseText);
-          }
-        };
-        xhttp.open("POST", "35.185.73.228:90", true);
-        xhttp.setRequestHeader("Content-Type", "application/json")
-        xhttp.send(JSON.stringify({email: this.state.email}));
-  
+      
+      if (this.validateEmail(this.state.email)) {
+        fetch('http://192.168.0.10:4567', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            state: 'veri',
+            email: this.state.email,
+          }),
+        }).then((response) => response.json())
+          .then((responseJson) => {
+            Alert.alert('Confirm', 'Your verification code is: ' + responseJson.confirm)
+          })
+          .catch((error) => {
+            console.error(error);
+            Alert.alert('Error', 'A connection error has occurred!')
+          });
+        
         this.props.navigation.navigate('Veri')
-      }else{
-  
+      } else {
         alert("Please enter a valid email address")
+
       }
       
     }
   
     render() {
       return (
-        <KeyboardAvoidingView style={stylesForReg.container} behavior="padding" enabled>
   
           <View style={stylesForReg.container}>
             <Image
@@ -73,7 +81,6 @@ export default class EmailVeri extends Component {
               <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
       );
     }
   }

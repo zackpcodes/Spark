@@ -12,18 +12,18 @@ import './Globals'
 
 
 function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 export default class ConvosFeed extends Component {
     constructor(props) {
       super(props);
   
       this.state = {
-        CONVOS: converstaions,
+        CONVOS: conversations,
         CONTACTS: [],
         contactsOrigin: [],
         search: '',
@@ -58,7 +58,7 @@ export default class ConvosFeed extends Component {
     };
   
     startConvo = title => {
-      converstaions.push({convoId: uuidv4(), title: title, messages: []})
+      conversations.push({convoId: uuidv4(), title: title, messages: []})
       this.setState(this.state)
       this.refs.modal2.close()
     };
@@ -66,6 +66,7 @@ export default class ConvosFeed extends Component {
     openChat = item => {
       curConversation = item
       this.props.navigation.navigate('IndividualConvo')
+      console.log(item.convoId)
     };
   
   
@@ -140,7 +141,7 @@ export default class ConvosFeed extends Component {
                     <Divider style={{backgroundColor: 'black'}}/>
                     </View>
                 )}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.convoId}
               />
             </View>
             <View style={stylesForConvos.startConvoButton}>

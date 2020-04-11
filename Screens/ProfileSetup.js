@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 
 import './styles';
+import './Globals';
 
 // ProfileSetup: Allows the user to set up a profile then makes 
 // a call to the server to push profile data.
@@ -30,7 +31,6 @@ export default class ProfileSetup extends Component {
     render() {
       let { image } = this.state;
       return (
-        <KeyboardAvoidingView style={stylesForReg.container} behavior="padding" enabled>
           <View style={stylesForReg.container}>
   
             <TouchableOpacity onPress={this._pickImage}>
@@ -54,7 +54,6 @@ export default class ProfileSetup extends Component {
               <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
       );
     }
   

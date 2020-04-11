@@ -26,7 +26,6 @@ export default class VeriScreen extends Component {
   
     render() {
       return (
-        <KeyboardAvoidingView style={stylesForReg.container} behavior="padding" enabled>
           <View style={stylesForReg.container}>
             <Image
               style={{ width: 210, height: 210, marginLeft: 20, }}
@@ -46,7 +45,6 @@ export default class VeriScreen extends Component {
               <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
       );
     }
   }
