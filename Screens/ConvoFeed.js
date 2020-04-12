@@ -29,6 +29,11 @@ export default class ConvosFeed extends Component {
         search: '',
       };
     }
+
+    profileUp = () => {
+      // Make api call here to push profile data to server
+      this.props.navigation.navigate('ProfileUpdate')
+    }
   
   
     updateSearch = text => {
@@ -107,7 +112,7 @@ export default class ConvosFeed extends Component {
   
           <View style={stylesForConvos.convoScreen}>
             <View style={{alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row'}}>
-              <TouchableOpacity onPress={null}>
+              <TouchableOpacity onPress={() => this.profileUp()} >
                 <Image source={{uri: userProfilepic}} style={stylesForConvos.profileMenuButton} />
               </TouchableOpacity>
                 

@@ -6,6 +6,8 @@ import ConvosFeed from './Screens/ConvoFeed';
 import EmailVeri from './Screens/EmailVeri';
 import ProfileSetup from './Screens/ProfileSetup';
 import VeriScreen from './Screens/VeriScreen';
+import ProfileUpdate from './Screens/ProfileUpdate';
+
 
 
 
@@ -16,6 +18,7 @@ const MainNavigator = createStackNavigator({
   ProfileSetup: { screen: ProfileSetup, navigationOptions: { headerShown: false } },
   IndividualConvo: { screen: Conversation, navigationOptions: { headerShown: false }},
   Convos: { screen: ConvosFeed, navigationOptions: { headerShown: false } },
+  ProfileUpdate: { screen: ProfileUpdate, navigationOptions: { headerShown: false } },
   
 });
 
