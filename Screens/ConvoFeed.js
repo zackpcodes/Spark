@@ -31,8 +31,11 @@ export default class ConvosFeed extends Component {
     }
 
     profileUp = () => {
-      // Make api call here to push profile data to server
       this.props.navigation.navigate('ProfileUpdate')
+    }
+
+    settings = () => {
+      this.props.navigation.navigate('Settings')
     }
   
   
@@ -121,7 +124,7 @@ export default class ConvosFeed extends Component {
                   source={require('./MainLogo.png')}
                 />
              
-              <TouchableOpacity onPress={null} style={{alignContent: 'center'}}>
+              <TouchableOpacity onPress={() => this.settings()} style={{alignContent: 'center'}}>
                 <Image
                   style={{ width: 40, height: 40, }}
                   source={require('./SettingsBtn.png')}
