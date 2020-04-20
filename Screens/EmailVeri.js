@@ -34,19 +34,18 @@ export default class EmailVeri extends Component {
     emailVeriRequest = () => {
       
       if (this.validateEmail(this.state.email)) {
-        fetch('http://192.168.0.10:4567', {
+        fetch('http://35.229.96.105:90/account/dispatch', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            state: 'veri',
             email: this.state.email,
           }),
-        }).then((response) => response.json())
+        }).then((response) => response.text())
           .then((responseJson) => {
-            Alert.alert('Confirm', 'Your verification code is: ' + responseJson.confirm)
+            console.log(responseJson)
           })
           .catch((error) => {
             console.error(error);
