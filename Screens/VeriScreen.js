@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View,TextInput, TouchableOpacity, Image} from 'react-native';
+import { Text, View,TextInput, TouchableOpacity, Image, Alert} from 'react-native';
 import { KeyboardAvoidingView } from 'react-native';
 
 import './styles';
@@ -11,6 +11,7 @@ export default class VeriScreen extends Component {
     constructor(props) {
       super(props);
       this.state = {
+        email: global.gEmail,
         veriCode: '',
         placeHolderText: "Enter Verification Code",
         btnText: 'Confirm'
@@ -19,8 +20,30 @@ export default class VeriScreen extends Component {
   
   
     codeVeriRequest = () => {
-      // Make api call here to verify entered code
-      this.props.navigation.navigate('ProfileSetup')
+        fetch('http://104.196.33.197:80/account/verify', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email_phone: this.state.email,
+            code: this.state.veriCode,
+          }),
+        }).then((response) => response.json())
+          .then((responseJson) => {
+            console.log(responseJson)
+            if (responseJson.status == 200){
+              this.props.navigation.navigate('ProfileSetup')
+            }else{
+              Alert.alert('Invalid', 'Invalid verification code, please check the code and try again.')
+            }
+            
+          })
+          .catch((error) => {
+            console.error(error);
+            Alert.alert('Error', 'A connection error has occurred!')
+          });
   
     }
   

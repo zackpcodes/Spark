@@ -7,6 +7,7 @@ import Constants from 'expo-constants';
 import './styles';
 import './Globals';
 
+
 // ProfileSetup: Allows the user to set up a profile then makes 
 // a call to the server to push profile data.
 export default class ProfileSetup extends Component {
@@ -24,8 +25,29 @@ export default class ProfileSetup extends Component {
 
   
     profilePush = () => {
-      // Make api call here to push profile data to server
-      this.props.navigation.navigate('Convos')
+      fetch('http://104.196.33.197:80/account/modify', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: this.state.usernameText,
+          }),
+        }).then((response) => response.json())
+          .then((responseJson) => {
+            console.log(responseJson)
+            if (responseJson.status == 200){
+              this.props.navigation.navigate('Convos')
+            }else{
+              Alert.alert('Invalid', 'Please login.')
+            }
+            
+          })
+          .catch((error) => {
+            console.error(error);
+            Alert.alert('Error', 'A connection error has occurred!')
+          });
     }
   
     render() {
@@ -59,7 +81,6 @@ export default class ProfileSetup extends Component {
   
     componentDidMount() {
       this.getPermissionAsync();
-      console.log('hi');
     }
   
     getPermissionAsync = async () => {
