@@ -20,7 +20,7 @@ export default class VeriScreen extends Component {
   
   
     codeVeriRequest = () => {
-        fetch('http://104.196.33.197:80/account/verify', {
+        fetch('http://spark.pemery.co/account/verify', {
           method: 'POST',
           headers: {
             Accept: 'application/json',

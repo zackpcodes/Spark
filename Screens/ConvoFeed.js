@@ -60,7 +60,7 @@ export default class ConvosFeed extends Component {
         this.state.contactsOrigin.push({contactId: uuidv4(), title: 'patrick'})
 
 
-          fetch('http://104.196.33.197:80/account/modify', {
+          fetch('http://spark.pemery.co/account/modify', {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -90,7 +90,7 @@ export default class ConvosFeed extends Component {
     };
   
     startConvo = title => {
-      fetch('http://104.196.33.197:80/chat/create', {
+      fetch('http://spark.pemery.co/chat/create', {
             method: 'POST',
             headers: {
               Accept: 'application/json',

@@ -25,7 +25,7 @@ export default class ProfileSetup extends Component {
 
   
     profilePush = () => {
-      fetch('http://104.196.33.197:80/account/modify', {
+      fetch('http://spark.pemery.co/account/modify', {
           method: 'POST',
           headers: {
             Accept: 'application/json',

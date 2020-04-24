@@ -35,7 +35,7 @@ export default class EmailVeri extends Component {
       
       if (this.validateEmail(this.state.email)) {
         global.gEmail = this.state.email
-        fetch('http://104.196.33.197:80/account/dispatch', {
+        fetch('http://spark.pemery.co/account/dispatch', {
           method: 'POST',
           headers: {
             Accept: 'application/json',

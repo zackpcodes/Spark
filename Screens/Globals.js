@@ -8,7 +8,7 @@ global.curConversation = null
 
 
 global.updateProfile = () => {
-        fetch('http://104.196.33.197:80/account', {
+        fetch('http://spark.pemery.co/account', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
