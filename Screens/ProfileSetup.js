@@ -14,8 +14,8 @@ export default class ProfileSetup extends Component {
       super(props);
       this.state = {
         image: userProfilepic,
-        organizationText: '',
-        usernameText: '',
+        organizationText: organization,
+        usernameText: uName,
         placeHolderOrganization: 'Organization',
         placeHolderUsername: "Username",
         btnText: 'Done'
@@ -41,12 +41,14 @@ export default class ProfileSetup extends Component {
               style={stylesForReg.textIn}
               placeholder={this.state.placeHolderOrganization}
               onChangeText={(organizationText) => this.setState({ organizationText })}
+              organization ={this.state.organizationText}
               value={this.state.organizationText}
             />
             <TextInput
               style={stylesForReg.textIn}
               placeholder={this.state.placeHolderUsername}
               onChangeText={(usernameText) => this.setState({ usernameText })}
+              uName ={this.state.usernameText}
               value={this.state.veriCode}
             />
   
