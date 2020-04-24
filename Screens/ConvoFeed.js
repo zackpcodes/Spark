@@ -37,7 +37,7 @@ export default class ConvosFeed extends Component {
     settings = () => {
       this.props.navigation.navigate('Settings')
     }
-  
+
   
     updateSearch = text => {
       const searchData = this.state.contactsOrigin.filter(item => {      
@@ -52,21 +52,67 @@ export default class ConvosFeed extends Component {
   
     openContacts = () => {
       this.updateSearch('')
-      if(this.state.contactsOrigin.length == 0){
-        //Test contacts below
         this.state.contactsOrigin.push({contactId: uuidv4(), title: 'zack'})
         this.state.contactsOrigin.push({contactId: uuidv4(), title: 'corwin'})
         this.state.contactsOrigin.push({contactId: uuidv4(), title: 'brad'})
         this.state.contactsOrigin.push({contactId: uuidv4(), title: 'connor'})
         this.state.contactsOrigin.push({contactId: uuidv4(), title: 'von'})
         this.state.contactsOrigin.push({contactId: uuidv4(), title: 'patrick'})
-        this.setState({CONTACTS: this.state.contactsOrigin})
-      }
+
+
+          fetch('http://spark.pemery.co/account/modify', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contacts: this.state.contactsOrigin,
+            }),
+          }).then((response) => response.json())
+            .then((responseJson) => {
+              console.log(responseJson);
+              if (responseJson.status == 200){
+                this.state.contactsOrigin = responseJson.content.contacts;
+                this.setState({CONTACTS: this.state.contactsOrigin});
+              
+              }else{
+                Alert.alert('Error', 'Please login!')
+              }
+              
+            })
+            .catch((error) => {
+              console.error(error);
+              Alert.alert('Error', 'A connection error has occurred!')
+            });
+
       this.refs.modal2.open()
     };
   
     startConvo = title => {
-      conversations.push({convoId: uuidv4(), title: title, messages: []})
+      fetch('http://spark.pemery.co/chat/create', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }).then((response) => response.json())
+            .then((responseJson) => {
+              console.log(responseJson);
+              if (responseJson.status == 200){
+                this.state.contactsOrigin = responseJson.content.contacts;
+                this.setState({CONTACTS: this.state.contactsOrigin});
+              
+              }else{
+                Alert.alert('Error', 'Please login!')
+              }
+              
+            })
+            .catch((error) => {
+              console.error(error);
+              Alert.alert('Error', 'A connection error has occurred!')
+            });
+
       this.setState(this.state)
       this.refs.modal2.close()
     };
@@ -77,6 +123,7 @@ export default class ConvosFeed extends Component {
       console.log(item.convoId)
     };
   
+
   
     
     render() {

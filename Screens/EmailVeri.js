@@ -3,7 +3,7 @@ import { Text, View, TextInput, TouchableOpacity, Image, Alert} from 'react-nati
 import { KeyboardAvoidingView } from 'react-native';
 
 import './styles';
-
+import './Globals';
 // EmailVeri: Ask's users to enter their email and a request is sent
 // to api on server for verification code.
 export default class EmailVeri extends Component {
@@ -34,7 +34,8 @@ export default class EmailVeri extends Component {
     emailVeriRequest = () => {
       
       if (this.validateEmail(this.state.email)) {
-        fetch('http://35.229.96.105:90/account/dispatch', {
+        global.gEmail = this.state.email
+        fetch('http://spark.pemery.co/account/dispatch', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -43,7 +44,7 @@ export default class EmailVeri extends Component {
           body: JSON.stringify({
             email: this.state.email,
           }),
-        }).then((response) => response.text())
+        }).then((response) => response.json())
           .then((responseJson) => {
             console.log(responseJson)
           })
