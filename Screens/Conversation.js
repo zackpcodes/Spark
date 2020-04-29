@@ -10,9 +10,39 @@ export default class Conversation extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        messages: global.curConversation.messages,
+        messages: this.convertToGifted(),
         title: 'Convo Title'
       };
+    }
+
+    convertToGifted() {
+      unconverted = global.curConversation.messages;
+      converted = []
+      converted.push({
+        _id: 1,
+          text: 'My message',
+          createdAt: new Date(Date.UTC(2016, 5, 11, 17, 20, 0)),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://facebook.github.io/react/img/logo_og.png',
+          },
+      })
+
+      for (let i = 0; i < unconverted.length;i++) {
+        converted.push(
+          {
+            _id: global.counter,
+            text: unconverted[i].content,
+            createdAt: unconverted[i].message_sent,
+            user: {
+              _id: unconverted[i].sender,
+            },
+          }
+        );
+        global.counter = global.counter + 1;
+      }
+      return converted;
     }
 
     componentDidMount() {
@@ -20,69 +50,41 @@ export default class Conversation extends Component {
         title: curConversation.name
       })
 
-      fetch('http://spark.pemery.co/', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            messages: curConversation.messages
-          }),
-        }).then((response) => response.json())
-          .then((responseJson) => {
-            
-            //this.state.messages = responseJson.messages
-
-          })
-          .catch((error) => {
-            console.error(error);
-            Alert.alert('Error', 'A connection error has occurred!')
-          });
-
-        this.setState(previousState => ({  
-          messages: GiftedChat.append(previousState.messages, this.state.messages),
-        }))
+      // this.setState(previousState => ({  
+      //   messages: GiftedChat.append(),
+      // }))
     }
   
     onSend(messages = []) {
+      // console.log("New messages");
+      // console.log(newMessages);
+      // var oldMessages = this.state.messages;
+      // var allMessages = oldMessages.push(newMessages[0]);
+
       this.setState(previousState => ({
-        messages: GiftedChat.append(previousState.messages, this.state.messages),
-      }))
+        messages: GiftedChat.append(previousState.messages, messages),
+      }));
 
-      fetch('http://spark.pemery.co', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            messages: curConversation.messages
-          }),
-        }).then((response) => response.json())
-          .then((responseJson) => {
+      // There needs to be a call here to post the new message to the server
 
-            this.setState((previousState) => {
-              return {
-                messages: GiftedChat.append(previousState.messages, {
-                  _id: Math.round(Math.random() * 1000000),
-                  text: responseJson.testmessage,
-                  createdAt: new Date(),
-                  user: {
-                    _id: 2,
-                    name: 'React Native',
-                    avatar: 'https://placeimg.com/140/140/any',
-                  },
-                }),
-              };
-            });
-            //this.state.messages = responseJson.messages
+      // fetch('http://spark.pemery.co', {
+      //     method: 'POST',
+      //     headers: {
+      //       Accept: 'application/json',
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       messages: curConversation.messages
+      //     }),
+      //   }).then((response) => response.json())
+      //     .then((responseJson) => {
+      //       //this.state.messages = responseJson.messages
 
-          })
-          .catch((error) => {
-            console.error(error);
-            Alert.alert('Error', 'A connection error has occurred!')
-          });
+      //     })
+      //     .catch((error) => {
+      //       console.error(error);
+      //       Alert.alert('Error', 'A connection error has occurred!')
+      //     });
           
     }
   
@@ -132,9 +134,9 @@ export default class Conversation extends Component {
             <GiftedChat
               messages={this.state.messages}
               onSend={messages => this.onSend(messages)}
-              user={{
-              _id: 1,
-              }}
+              // user={{
+              // _id: 1,
+              // }}
               renderBubble={this.renderBubble}
             />
   

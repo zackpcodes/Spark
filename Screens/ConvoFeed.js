@@ -239,9 +239,14 @@ export default class ConvosFeed extends Component {
         if (responseJson.status == 200) {
           for (let i = 0; i < responseJson.content.messages.length; ++i) {
             if (responseJson.content.messages[i].cuuid == item.cuuid) {
-              item.messages.push(responseJson.content.messages[i].content)
+              item.messages.push({
+                content: responseJson.content.messages[i].content,
+                timestamp: responseJson.content.messages[i].message_sent,
+                sender: responseJson.content.messages[i].sender,
+              });
             }
           }
+          global.curConversation = item
           this.props.navigation.navigate('IndividualConvo')
         } else {
           Alert.alert('Error', responseJson.content.comment)
