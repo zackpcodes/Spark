@@ -17,6 +17,8 @@ export default class ConvosFeed extends Component {
       CONTACTS: [],
       contactsOrigin: global.contacts,
       search: '',
+      emailToSearch: '',
+      emailSearchResult: null,
     };
   }
 
@@ -262,10 +264,86 @@ export default class ConvosFeed extends Component {
   };
 
 
+
+  searchForContact = email => {
+    fetch('http://spark.pemery.co/account/search/', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email_phone: email,
+      }),
+    }).then((response) => response.json())
+      .then((responseJson) => {
+        if (responseJson.status == 200) {
+          this.setState({emailSearchResult: responseJson})
+        } else {
+          Alert.alert('Error', responseJson.content.comment)
+          this.props.navigation.replace('Email')
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        Alert.alert('Error', 'Promise rejection error')
+      });
+  }
+
+
+  addContact = () => {
+
+    console.log(this.state.emailSearchResult)
+
+    fetch('http://spark.pemery.co/account/modify/', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uuid: response[i].content.members[1],
+      }),
+    }).then((response) => response.json())
+      .then((responseJson) => {
+        if (responseJson.status == 200) {
+
+        } else {
+          Alert.alert('Error', responseJson.content.comment)
+          this.props.navigation.replace('Email')
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        Alert.alert('Error', 'Promise rejection error')
+      });
+  }
+
+
   render() {
     return (
 
       <SafeAreaView>
+        <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false} position={"top"} ref={"modal1"}>
+          <View>
+            <Text style={{ padding: 20, fontSize: 20, }}>New Contact</Text>
+          </View>
+          <View style={{ width: '100%', }}>
+            <TextInput
+              style={{ height: 50, borderColor: 'gray', borderWidth: .2, textAlign: "center", fontSize: 15, borderRadius: 10, }}
+              onChangeText={text => this.setState({ emailToSearch: text })}
+              placeholder='Enter email to search'
+            />
+            <TouchableOpacity onPress={() => this.searchForContact(this.state.emailToSearch)} >
+              <Text style={{ fontSize: 19, padding: 17 }}>Search</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.addContact()} >
+              <Text style={{ fontSize: 19, padding: 17 }}>Add Contact</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+
         <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false} position={"top"} ref={"modal2"}>
           <View>
             <Text style={{ padding: 20, fontSize: 20, }}>New Conversation</Text>
@@ -277,6 +355,7 @@ export default class ConvosFeed extends Component {
               placeholder='Find Contact...'
             />
           </View>
+          
           <View style={stylesForConvos.contactsList}>
             <FlatList
               data={this.state.contactsOrigin}
@@ -292,6 +371,9 @@ export default class ConvosFeed extends Component {
               keyExtractor={item => item.uuid}
             />
           </View>
+          <TouchableOpacity style={stylesForConvos.addContact} onPress={() => this.refs.modal1.open()} >
+              <Text style={{ fontSize: 19, padding: 17 }}>Add Contact</Text>
+          </TouchableOpacity>
         </Modal>
 
 
