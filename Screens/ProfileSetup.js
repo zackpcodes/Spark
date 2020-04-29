@@ -34,7 +34,7 @@ export default class ProfileSetup extends Component {
         }).then((response) => response.json())
           .then((responseJson) => {
             console.log(responseJson)
-            if (responseJson.status == 200){
+            if (responseJson.status == 202){
               this.props.navigation.replace('Convos')
             }else{
               Alert.alert('Invalid', 'Please login.')

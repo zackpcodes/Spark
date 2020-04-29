@@ -64,12 +64,38 @@ export default class ConvosFeed extends Component {
             }));
         }
 
-        Promise.all(promises).then(response =>{
-          console.log(response)
+        Promise.all(promises).then(response => {
+          let promises2 = []
+          for (let i = 0; i < response.length; ++i) {
+            promises2.push(fetch('http://spark.pemery.co/account/search/', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                uuid: response[i].content.members[1],
+              }),
+            }).then((response) => response.json())
+              .then((responseJson) => {
+                if (responseJson.status == 200) {
 
-        }).catch(error => console.log('Error in promises'));
+                  this.state.CONVOS.push({ cuuid: response[i].content.cuuid, uuid: response[i].content.members[1], name: responseJson.content.name, email_phone: responseJson.content.email_phone, messages: [] });
+                  this.setState(this.state);
+
+                } else {
+                  Alert.alert('Error', responseJson.content.comment)
+                  this.props.navigation.replace('Email')
+                }
+              })
+              .catch((error) => {
+                console.log(error)
+                Alert.alert('Error', 'Promise rejection error')
+              }));
+          }
 
 
+        }).catch(error => console.log('Error in promises2'));
 
       })
       .catch((error) => {
@@ -152,9 +178,33 @@ export default class ConvosFeed extends Component {
           .then((responseJson) => {
             console.log(responseJson)
             if (responseJson.status == 200) {
-              this.state.CONVOS = [{ cuuid: responseJson.content.cuuid, uuid: responseJson.content.uuid, email_phone: item.email_phone }];
-              this.setState(this.state)
-              this.refs.modal2.close()
+              fetch('http://spark.pemery.co/account/search/', {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  uuid: responseJson.content.uuid,
+                }),
+              }).then((response) => response.json())
+                .then((responseJson2) => {
+                  if (responseJson2.status == 200) {
+
+                    this.state.CONVOS.push({ cuuid: responseJson.content.cuuid, uuid: responseJson.content.uuid, name: responseJson2.content.name, email_phone: item.email_phone, messages: [] });
+                    this.setState(this.state);
+                    this.refs.modal2.close();
+
+                  } else {
+                    Alert.alert('Error', responseJson.content.comment)
+                    this.props.navigation.replace('Email')
+                  }
+                })
+                .catch((error) => {
+                  console.log(error)
+                  Alert.alert('Error', 'Promise rejection error')
+                });
+
             } else {
               Alert.alert('Error', responseJson.content.comment)
               this.props.navigation.replace('Email')
@@ -175,7 +225,35 @@ export default class ConvosFeed extends Component {
 
   openChat = item => {
     global.curConversation = item
-    this.props.navigation.navigate('IndividualConvo')
+
+    fetch('http://spark.pemery.co/notifications/', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+      }),
+    }).then((response) => response.json())
+      .then((responseJson) => {
+        if (responseJson.status == 200) {
+          for (let i = 0; i < responseJson.content.messages.length; ++i) {
+            if (responseJson.content.messages[i].cuuid == item.cuuid) {
+              item.messages.push(responseJson.content.messages[i].content)
+            }
+          }
+          this.props.navigation.navigate('IndividualConvo')
+        } else {
+          Alert.alert('Error', responseJson.content.comment)
+          this.props.navigation.replace('Email')
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        Alert.alert('Error', 'Promise rejection error')
+      });
+
+
   };
 
 
@@ -200,7 +278,7 @@ export default class ConvosFeed extends Component {
               renderItem={({ item }) => (
                 <ListItem
                   roundAvatar
-                  title={item.email_phone}
+                  title={item.name}
                   leftAvatar={{ source: { uri: 'https://placeimg.com/140/140/any' } }}
                   onPress={() => { this.startConvo(item) }}
                   bottomDivider
@@ -237,7 +315,7 @@ export default class ConvosFeed extends Component {
                 <View>
                   <ListItem
                     roundAvatar
-                    title={item.email_phone}
+                    title={item.name}
                     leftAvatar={{ source: { uri: 'https://placeimg.com/140/140/any' } }}
                     containerStyle={{ borderBottomWidth: 0 }}
                     onPress={() => { this.openChat(item) }}

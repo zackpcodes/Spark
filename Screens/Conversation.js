@@ -7,9 +7,12 @@ import Constants from 'expo-constants';
 import './Globals'
 
 export default class Conversation extends Component {
-    state = {
-      messages: curConversation.messages,
-      title: 'Convo Title'
+    constructor(props) {
+      super(props);
+      this.state = {
+        messages: global.curConversation.messages,
+        title: 'Convo Title'
+      };
     }
 
     componentDidMount() {
@@ -38,13 +41,13 @@ export default class Conversation extends Component {
           });
 
         this.setState(previousState => ({  
-          messages: GiftedChat.append(previousState.messages, messages),
+          messages: GiftedChat.append(previousState.messages, this.state.messages),
         }))
     }
   
     onSend(messages = []) {
       this.setState(previousState => ({
-        messages: GiftedChat.append(previousState.messages, messages),
+        messages: GiftedChat.append(previousState.messages, this.state.messages),
       }))
 
       fetch('http://spark.pemery.co', {
