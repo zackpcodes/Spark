@@ -110,5 +110,15 @@ global.stylesForReg = StyleSheet.create({
       width: "100%",
       flex: 1,
     },
+    addContact: {
+      alignItems: 'center',
+      backgroundColor: '#1985a1',
+      width: "100%",
+      height: 65,
+      marginTop: 30,
+      marginBottom: 70,
+      borderRadius: 2,
+      opacity: 0.7,
+    }
   
   });
