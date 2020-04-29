@@ -40,6 +40,15 @@ global.stylesForReg = StyleSheet.create({
       borderColor: '#1985a1',
       marginBottom: 160,
     },
+
+    sText: {
+      textAlign: 'center',
+      height: 60,
+      padding: 10,
+      width: 290,
+      fontSize: 32,
+      marginTop: 10,
+    }
   });
   
   

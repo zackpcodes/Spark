@@ -12,7 +12,8 @@ export default class ProfileSetup extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        btnText: 'Done'
+        btnText: 'Done',
+        statusText: 'Coming Soon!!!'
       };
     }
 
@@ -24,6 +25,8 @@ export default class ProfileSetup extends Component {
     render() {
         return (
             <View style ={stylesForReg.container}>
+
+                <Text style={stylesForReg.sText}>{this.state.statusText}</Text>
 
                 <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.settingsPush()}>
                     <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>

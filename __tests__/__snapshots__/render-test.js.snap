@@ -361,6 +361,20 @@ exports[`Settings renders correctly 1`] = `
     }
   }
 >
+  <Text
+    style={
+      Object {
+        "fontSize": 32,
+        "height": 60,
+        "marginTop": 10,
+        "padding": 10,
+        "textAlign": "center",
+        "width": 290,
+      }
+    }
+  >
+    Coming Soon!!!
+  </Text>
   <View
     accessible={true}
     focusable={true}
