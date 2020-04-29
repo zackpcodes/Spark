@@ -13,7 +13,7 @@ export default class ProfileUpdate extends Component {
     constructor(props){
         super(props);
         this.state = {
-            image: userProfilepic,
+            image: global.userProfilePic,
             organizationText: '',
             usernameText: '',
             btnText: 'Done'
@@ -22,7 +22,7 @@ export default class ProfileUpdate extends Component {
 
     profilePush = () => {
         // Make api call here to 
-        this.props.navigation.navigate('Convos')
+        this.props.navigation.replace('Convos')
     }
 
     render() {

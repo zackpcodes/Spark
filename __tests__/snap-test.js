@@ -10,12 +10,10 @@ test('renders correctly', () => {
   const treeProfile = renderer.create(<ProfileSetup />).toJSON();
   expect(treeProfile).toMatchSnapshot();
 
-  const treeEmailVeri = renderer.create(<EmailVeri />).toJSON();
-  expect(treeEmailVeri).toMatchSnapshot();
+});
 
-  const treeVeri = renderer.create(<VeriScreen />).toJSON();
-  expect(treeVeri).toMatchSnapshot();
+test('renders correctly', () => {
+  const treeProfile = renderer.create(<EmailVeri />).toJSON();
+  expect(treeProfile).toMatchSnapshot();
 
-  const treeVeri = renderer.create(<VeriScreen />).toJSON();
-  expect(treeVeri).toMatchSnapshot();
 });

@@ -14,18 +14,15 @@ export default class ProfileSetup extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        image: userProfilepic,
+        image: global.userProfilePic,
         organizationText: '',
         usernameText: '',
-        placeHolderOrganization: 'Organization',
-        placeHolderUsername: "Username",
-        btnText: 'Done'
       };
     }
 
   
     profilePush = () => {
-      fetch('http://104.196.33.197:80/account/modify', {
+      fetch('http://spark.pemery.co/account/modify', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -38,7 +35,7 @@ export default class ProfileSetup extends Component {
           .then((responseJson) => {
             console.log(responseJson)
             if (responseJson.status == 200){
-              this.props.navigation.navigate('Convos')
+              this.props.navigation.replace('Convos')
             }else{
               Alert.alert('Invalid', 'Please login.')
             }
@@ -61,19 +58,19 @@ export default class ProfileSetup extends Component {
   
             <TextInput
               style={stylesForReg.textIn}
-              placeholder={this.state.placeHolderOrganization}
+              placeholder='Organization'
               onChangeText={(organizationText) => this.setState({ organizationText })}
               value={this.state.organizationText}
             />
             <TextInput
               style={stylesForReg.textIn}
-              placeholder={this.state.placeHolderUsername}
+              placeholder='Username'
               onChangeText={(usernameText) => this.setState({ usernameText })}
               value={this.state.veriCode}
             />
   
             <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.profilePush()}>
-              <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
+              <Text style={{ fontSize: 19, padding: 17 }}>Done</Text>
             </TouchableOpacity>
           </View>
       );

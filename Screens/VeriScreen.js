@@ -11,7 +11,7 @@ export default class VeriScreen extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        email: global.gEmail,
+        email: global.email_phone,
         veriCode: '',
         placeHolderText: "Enter Verification Code",
         btnText: 'Confirm'
@@ -20,7 +20,8 @@ export default class VeriScreen extends Component {
   
   
     codeVeriRequest = () => {
-        fetch('http://104.196.33.197:80/account/verify', {
+
+        fetch('http://spark.pemery.co/account/verify', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -34,7 +35,7 @@ export default class VeriScreen extends Component {
           .then((responseJson) => {
             console.log(responseJson)
             if (responseJson.status == 200){
-              this.props.navigation.navigate('ProfileSetup')
+              this.props.navigation.replace('ProfileSetup')
             }else{
               Alert.alert('Invalid', 'Invalid verification code, please check the code and try again.')
             }

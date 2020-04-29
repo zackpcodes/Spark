@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, TouchableOpacity, Image} from 'react-native';
 import {Divider } from 'react-native-elements';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import Constants from 'expo-constants';
 
 import './Globals'
@@ -14,8 +14,7 @@ export default class Conversation extends Component {
 
     componentDidMount() {
       this.setState({
-        title: curConversation.title
-        
+        title: curConversation.name
       })
 
       fetch('http://192.168.0.10:4567', {
@@ -25,7 +24,6 @@ export default class Conversation extends Component {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            state: 'messages',
             messages: curConversation.messages
           }),
         }).then((response) => response.json())
@@ -42,7 +40,6 @@ export default class Conversation extends Component {
   
     onSend(messages = []) {
       this.setState(previousState => ({
-
         messages: GiftedChat.append(previousState.messages, messages),
       }))
 
@@ -53,8 +50,6 @@ export default class Conversation extends Component {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-
-            state: 'messages',
             messages: curConversation.messages
           }),
         }).then((response) => response.json())
@@ -89,6 +84,22 @@ export default class Conversation extends Component {
       this.props.navigation.navigate('Convos')
       
     }
+
+    renderBubble (props) {
+      return (
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#1985a1'
+            },
+            left: {
+              backgroundColor: '#c5c3c6'
+            },
+          }}
+        />
+      )
+    }
   
     render() {
       return (
@@ -117,6 +128,7 @@ export default class Conversation extends Component {
               user={{
               _id: 1,
               }}
+              renderBubble={this.renderBubble}
             />
   
           

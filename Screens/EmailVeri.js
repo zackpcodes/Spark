@@ -4,6 +4,9 @@ import { KeyboardAvoidingView } from 'react-native';
 
 import './styles';
 import './Globals';
+
+
+
 // EmailVeri: Ask's users to enter their email and a request is sent
 // to api on server for verification code.
 export default class EmailVeri extends Component {
@@ -11,12 +14,10 @@ export default class EmailVeri extends Component {
       super(props);
       this.state = {
         email: '',
-        placeHolderText: "Enter your email",
-        btnText: 'Continue'
       };
     }
   
-    
+
     validateEmail = (text) => {
       console.log(text);
       let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -32,10 +33,9 @@ export default class EmailVeri extends Component {
   
   
     emailVeriRequest = () => {
-      
+      global.email_phone = this.state.email
       if (this.validateEmail(this.state.email)) {
-        global.gEmail = this.state.email
-        fetch('http://104.196.33.197:80/account/dispatch', {
+        fetch('http://spark.pemery.co/account/dispatch', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -46,20 +46,24 @@ export default class EmailVeri extends Component {
           }),
         }).then((response) => response.json())
           .then((responseJson) => {
-            console.log(responseJson)
+            if (responseJson.status == 200){
+              this.props.navigation.replace('Veri');
+            }else{
+              Alert.alert('Error', responseJson.content.comment);
+            }
+            
           })
           .catch((error) => {
-            console.error(error);
-            Alert.alert('Error', 'A connection error has occurred!')
+            console.log(error)
+            Alert.alert('Error', 'Promise rejection error')
           });
         
-        this.props.navigation.navigate('Veri')
       } else {
         alert("Please enter a valid email address")
 
-      }
-      
+      } 
     }
+
   
     render() {
       return (
@@ -72,13 +76,13 @@ export default class EmailVeri extends Component {
             <Text style={{ marginBottom: 160, fontSize: 55, textAlign: 'center', fontFamily: 'sans-serif-thin', }}>SPARK</Text>
             <TextInput
               style={stylesForReg.textIn}
-              placeholder={this.state.placeHolderText}
+              placeholder='Enter Your Email'
               onChangeText={(email) => this.setState({ email })}
               value={this.state.email}
             />
   
             <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.emailVeriRequest()}>
-              <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
+              <Text style={{ fontSize: 19, padding: 17 }}>Continue</Text>
             </TouchableOpacity>
           </View>
       );

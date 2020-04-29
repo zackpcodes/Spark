@@ -12,13 +12,12 @@ export default class ProfileSetup extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        btnText: 'Done'
       };
     }
 
     settingsPush = () => {
 
-        this.props.navigation.navigate('Convos')
+        this.props.navigation.replace('Convos')
       }
 
     render() {
@@ -26,7 +25,10 @@ export default class ProfileSetup extends Component {
             <View style ={stylesForReg.container}>
 
                 <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.settingsPush()}>
-                    <Text style={{ fontSize: 19, padding: 17 }}>{this.state.btnText}</Text>
+                    <Text style={{ fontSize: 19, padding: 17 }}>Done</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.settingsPush()}>
+                    <Text style={{ fontSize: 19, padding: 17 }}>Logout</Text>
                 </TouchableOpacity>
             </View>
         );
