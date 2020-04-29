@@ -24,6 +24,8 @@ export default class ProfileSetup extends Component {
         return (
             <View style ={stylesForReg.container}>
 
+                <Text style={stylesForReg.sText}>{this.state.statusText}</Text>
+
                 <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.settingsPush()}>
                     <Text style={{ fontSize: 19, padding: 17 }}>Done</Text>
                 </TouchableOpacity>

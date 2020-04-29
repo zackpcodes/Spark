@@ -60,12 +60,14 @@ export default class ProfileSetup extends Component {
               style={stylesForReg.textIn}
               placeholder='Organization'
               onChangeText={(organizationText) => this.setState({ organizationText })}
+              organization ={this.state.organizationText}
               value={this.state.organizationText}
             />
             <TextInput
               style={stylesForReg.textIn}
               placeholder='Username'
               onChangeText={(usernameText) => this.setState({ usernameText })}
+              uName ={this.state.usernameText}
               value={this.state.veriCode}
             />
   

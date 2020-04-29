@@ -17,7 +17,7 @@ export default class Conversation extends Component {
         title: curConversation.name
       })
 
-      fetch('http://192.168.0.10:4567', {
+      fetch('http://spark.pemery.co/', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -36,6 +36,10 @@ export default class Conversation extends Component {
             console.error(error);
             Alert.alert('Error', 'A connection error has occurred!')
           });
+
+        this.setState(previousState => ({  
+          messages: GiftedChat.append(previousState.messages, messages),
+        }))
     }
   
     onSend(messages = []) {
@@ -43,7 +47,7 @@ export default class Conversation extends Component {
         messages: GiftedChat.append(previousState.messages, messages),
       }))
 
-      fetch('http://192.168.0.10:4567', {
+      fetch('http://spark.pemery.co', {
           method: 'POST',
           headers: {
             Accept: 'application/json',

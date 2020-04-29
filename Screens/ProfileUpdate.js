@@ -36,14 +36,16 @@ export default class ProfileUpdate extends Component {
   
             <TextInput
               style={stylesForReg.textIn}
-              placeholder={this.state.placeHolderOrganization}
+              placeholder={this.state.organizationText}
               onChangeText={(organizationText) => this.setState({ organizationText })}
+              organization ={this.state.organizationText}
               value={this.state.organizationText}
             />
             <TextInput
               style={stylesForReg.textIn}
-              placeholder={this.state.placeHolderUsername}
+              placeholder={this.state.usernameText}
               onChangeText={(usernameText) => this.setState({ usernameText })}
+              uName ={this.state.usernameText}
               value={this.state.veriCode}
             />
   
