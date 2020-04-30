@@ -6,6 +6,10 @@ import Constants from 'expo-constants';
 
 import './Globals'
 
+
+
+
+
 export default class Conversation extends Component {
     constructor(props) {
       super(props);
@@ -15,6 +19,66 @@ export default class Conversation extends Component {
       };
     }
 
+    componentDidMount() {
+      global.beforeCheckingNotifications = this.state.messages;
+
+      this.setState({
+        title: curConversation.name
+      })
+
+
+      setInterval(() => {
+        var returnedConversations = global.beforeCheckingNotifications;
+
+        var currentStateMessages = global.beforeCheckingNotifications;
+
+        var newMessages;
+
+        console.log(returnedConversations);
+
+        fetch('http://spark.pemery.co/notifications/', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+          }),
+        }).then((response) => response.json())
+          .then((responseJson) => {
+            if (responseJson.status == 200) {
+              for (let i = 0; i < responseJson.content.messages.length; ++i) {
+                if (responseJson.content.messages[i].cuuid == returnedConversations.cuuid) {
+                  returnedConversations.messages.push({
+                    content: responseJson.content.messages[i].content,
+                    timestamp: responseJson.content.messages[i].message_sent,
+                    sender: responseJson.content.messages[i].sender,
+                  });
+                }
+              }
+            } 
+            newMessages = this.convertToGifted(returnedConversations);
+            console.log("New messages: ");
+            console.log(newMessages);
+
+            console.log("Old messages: ");
+            console.log(currentStateMessages);
+            if (newMessages.length != currentStateMessages.length) {
+              console.log("Not equal");
+              this.setState({
+                messages: newMessages
+              });
+            } else {
+              console.log("Equal");
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+            Alert.alert('Error', 'Promise rejection error')
+          });
+          }, 5000);
+    }
+  
     convertToGifted(messages = global.curConversation.messages) {
       unconverted = messages;
       converted = []
@@ -28,7 +92,7 @@ export default class Conversation extends Component {
             avatar: 'https://facebook.github.io/react/img/logo_og.png',
           },
       })
-
+    
       for (let i = 0; i < unconverted.length;i++) {
         converted.push(
           {
@@ -45,52 +109,6 @@ export default class Conversation extends Component {
       return converted;
     }
 
-    componentDidMount() {
-      global.beforeCheckingNotifications = this.messages;
-
-      this.setState({
-        title: curConversation.name
-      })
-
-      setInterval(function() {
-        var returnedConversation = global.beforeCheckingNotifications;
-
-        fetch('http://spark.pemery.co/notifications/', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-          }),
-        }).then((response) => response.json())
-          .then((responseJson) => {
-            if (responseJson.status == 200) {
-              for (let i = 0; i < responseJson.content.messages.length; ++i) {
-                if (responseJson.content.messages[i].cuuid == returnedConversation.cuuid) {
-                  returnedConversation.messages.push({
-                    content: responseJson.content.messages[i].content,
-                    timestamp: responseJson.content.messages[i].message_sent,
-                    sender: responseJson.content.messages[i].sender,
-                  });
-                }
-              }
-            } 
-            var newMessages = this.convertToGifted(returnedConversation);
-            if (newMessages != this.state.messages) {
-              this.setState({
-                messages: newMessages
-              });
-            }
-
-          })
-          .catch((error) => {
-            console.log(error)
-            Alert.alert('Error', 'Promise rejection error')
-          });
-          }, 5000);
-    }
-  
     onSend(messages = []) {
 
       this.setState(previousState => ({
@@ -114,6 +132,8 @@ export default class Conversation extends Component {
           .then((responseJson) => {
             if(responseJson.status == 200) {
               console.log("Sent successfully");
+              console.log("Message that was sent: ");
+              console.log(messages[0])
             } else {
               console.log("Send message failed");
             }
