@@ -296,19 +296,37 @@ export default class ConvosFeed extends Component {
 
     console.log(this.state.emailSearchResult)
 
-    fetch('http://spark.pemery.co/account/modify/', {
+    fetch('http://spark.pemery.co/account/', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email_phone: this.state.emailSearchResult,
-      }),
     }).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.status == 200) {
+          fetch('http://spark.pemery.co/account/modify/', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email_phone: this.state.emailSearchResult,
+            }),
+          }).then((response) => response.json())
+            .then((responseJson2) => {
+              if (responseJson2.status == 200) {
 
+              } else {
+                Alert.alert('Error', responseJson2.content.comment)
+                this.props.navigation.replace('Email')
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+              Alert.alert('Error', 'Promise rejection error')
+            });
         } else {
           Alert.alert('Error', responseJson.content.comment)
           this.props.navigation.replace('Email')
@@ -318,6 +336,8 @@ export default class ConvosFeed extends Component {
         console.log(error)
         Alert.alert('Error', 'Promise rejection error')
       });
+
+    
   }
 
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TouchableOpacity, Image} from 'react-native';
+import { Text, View, TouchableOpacity, Image, Alert} from 'react-native';
 import {Divider } from 'react-native-elements';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import Constants from 'expo-constants';
