@@ -49,17 +49,9 @@ export default class Conversation extends Component {
       this.setState({
         title: curConversation.name
       })
-
-      // this.setState(previousState => ({  
-      //   messages: GiftedChat.append(),
-      // }))
     }
   
     onSend(messages = []) {
-      // console.log("New messages");
-      // console.log(newMessages);
-      // var oldMessages = this.state.messages;
-      // var allMessages = oldMessages.push(newMessages[0]);
 
       this.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, messages),
@@ -67,24 +59,29 @@ export default class Conversation extends Component {
 
       // There needs to be a call here to post the new message to the server
 
-      // fetch('http://spark.pemery.co', {
-      //     method: 'POST',
-      //     headers: {
-      //       Accept: 'application/json',
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       messages: curConversation.messages
-      //     }),
-      //   }).then((response) => response.json())
-      //     .then((responseJson) => {
-      //       //this.state.messages = responseJson.messages
+      fetch('http://spark.pemery.co/chat/send', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message_type: 'text',
+            content: messages[0].text
+          }),
+        }).then((response) => response.json())
+          .then((responseJson) => {
+            if(responseJson.status == 200) {
+              console.log("Sent successfully");
+            } else {
+              console.log("Send message failed");
+            }
 
-      //     })
-      //     .catch((error) => {
-      //       console.error(error);
-      //       Alert.alert('Error', 'A connection error has occurred!')
-      //     });
+          })
+          .catch((error) => {
+            console.error(error);
+            Alert.alert('Error', 'A connection error has occurred!')
+          });
           
     }
   
@@ -113,12 +110,12 @@ export default class Conversation extends Component {
     render() {
       return (
           <View style={{flex: 1,}}>
-            <View style={{alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row', marginTop: Constants.statusBarHeight,}}>
+            <View style={{alignItems: 'center', padding: 0, justifyContent: 'space-between', flexDirection: 'row', marginTop: Constants.statusBarHeight,}}>
               <TouchableOpacity onPress={this.backToConvos} style={{alignContent: 'center', marginLeft: 10,}}>
                 <Text style={{fontSize: 30, fontWeight: 'bold', color: '#1985a1'}}>&lt;</Text>
               </TouchableOpacity>
   
-              <Text style={{fontSize: 20, fontWeight: 'bold', color: '#1985a1', marginLeft:13}}>{this.state.title}</Text>
+              <Text style={{fontSize: 20, fontWeight: 'bold', color: '#1985a1', marginLeft:0}}>{this.state.title}</Text>
   
               <TouchableOpacity onPress={null} style={{alignContent: 'center'}}>
                 <Image
@@ -135,6 +132,7 @@ export default class Conversation extends Component {
               messages={this.state.messages}
               onSend={messages => this.onSend(messages)}
               // user={{
+              renderAvatar={null}
               // _id: 1,
               // }}
               renderBubble={this.renderBubble}
