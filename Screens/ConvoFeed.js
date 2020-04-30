@@ -303,7 +303,7 @@ export default class ConvosFeed extends Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        uuid: response[i].content.members[1],
+        email_phone: this.state.emailSearchResult,
       }),
     }).then((response) => response.json())
       .then((responseJson) => {
