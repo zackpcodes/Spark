@@ -24,6 +24,7 @@ export default class ConvosFeed extends Component {
 
 
   componentDidMount() {
+    
     fetch('http://spark.pemery.co/chat/active/', {
       method: 'POST',
       headers: {
@@ -54,6 +55,7 @@ export default class ConvosFeed extends Component {
           }).then((response) => response.json())
             .then((responseJson) => {
               if (responseJson.status == 200) {
+                this.setState({CONVOS: []});
                 return responseJson
               } else {
                 Alert.alert('Error', responseJson.content.comment)
@@ -68,6 +70,7 @@ export default class ConvosFeed extends Component {
 
         Promise.all(promises).then(response => {
           let promises2 = []
+          
           for (let i = 0; i < response.length; ++i) {
             promises2.push(fetch('http://spark.pemery.co/account/search/', {
               method: 'POST',
@@ -81,8 +84,7 @@ export default class ConvosFeed extends Component {
             }).then((response) => response.json())
               .then((responseJson) => {
                 if (responseJson.status == 200) {
-
-                  this.state.CONVOS.push({ cuuid: response[i].content.cuuid, uuid: response[i].content.members[1], name: responseJson.content.name, email_phone: responseJson.content.email_phone, messages: [] });
+                  this.state.CONVOS.push({ cuuid: response[i].content.cuuid, uuid: response[i].content.members[1], name: responseJson.content.name, email_phone: responseJson.content.email_phone, messages: [], counter: 0});
                   this.setState(this.state);
 
                 } else {
@@ -193,7 +195,7 @@ export default class ConvosFeed extends Component {
                 .then((responseJson2) => {
                   if (responseJson2.status == 200) {
 
-                    this.state.CONVOS.push({ cuuid: responseJson.content.cuuid, uuid: responseJson.content.uuid, name: responseJson2.content.name, email_phone: item.email_phone, messages: [] });
+                    this.state.CONVOS.push({ cuuid: responseJson.content.cuuid, uuid: responseJson.content.uuid, name: responseJson2.content.name, email_phone: item.email_phone, messages: [], counter: 0});
                     this.setState(this.state);
                     this.refs.modal2.close();
 
@@ -226,42 +228,8 @@ export default class ConvosFeed extends Component {
 
 
   openChat = item => {
-    global.curConversation = item
-    global.beforeCheckingNotifications = item
-
-    fetch('http://spark.pemery.co/notifications/', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-      }),
-    }).then((response) => response.json())
-      .then((responseJson) => {
-        if (responseJson.status == 200) {
-          for (let i = 0; i < responseJson.content.messages.length; ++i) {
-            if (responseJson.content.messages[i].cuuid == item.cuuid) {
-              item.messages.push({
-                content: responseJson.content.messages[i].content,
-                timestamp: responseJson.content.messages[i].message_sent,
-                sender: responseJson.content.messages[i].sender,
-              });
-            }
-          }
-          global.curConversation = item
-          this.props.navigation.navigate('IndividualConvo')
-        } else {
-          Alert.alert('Error', responseJson.content.comment)
-          this.props.navigation.replace('Email')
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-        Alert.alert('Error', 'Promise rejection error')
-      });
-
-
+    global.curConversation = item;
+    this.props.navigation.navigate('IndividualConvo');
   };
 
 
