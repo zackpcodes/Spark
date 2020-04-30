@@ -8,4 +8,5 @@ global.curConversation = null
 global.refreshBy = null
 global.isLoggedIn = null
 global.counter = 1
+global.beforeCheckingNotifications = null
 

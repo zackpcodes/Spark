@@ -227,6 +227,7 @@ export default class ConvosFeed extends Component {
 
   openChat = item => {
     global.curConversation = item
+    global.beforeCheckingNotifications = item
 
     fetch('http://spark.pemery.co/notifications/', {
       method: 'POST',

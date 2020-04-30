@@ -15,8 +15,8 @@ export default class Conversation extends Component {
       };
     }
 
-    convertToGifted() {
-      unconverted = global.curConversation.messages;
+    convertToGifted(messages = global.curConversation.messages) {
+      unconverted = messages;
       converted = []
       converted.push({
         _id: 1,
@@ -46,9 +46,49 @@ export default class Conversation extends Component {
     }
 
     componentDidMount() {
+      global.beforeCheckingNotifications = this.messages;
+
       this.setState({
         title: curConversation.name
       })
+
+      setInterval(function() {
+        var returnedConversation = global.beforeCheckingNotifications;
+
+        fetch('http://spark.pemery.co/notifications/', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+          }),
+        }).then((response) => response.json())
+          .then((responseJson) => {
+            if (responseJson.status == 200) {
+              for (let i = 0; i < responseJson.content.messages.length; ++i) {
+                if (responseJson.content.messages[i].cuuid == returnedConversation.cuuid) {
+                  returnedConversation.messages.push({
+                    content: responseJson.content.messages[i].content,
+                    timestamp: responseJson.content.messages[i].message_sent,
+                    sender: responseJson.content.messages[i].sender,
+                  });
+                }
+              }
+            } 
+            var newMessages = this.convertToGifted(returnedConversation);
+            if (newMessages != this.state.messages) {
+              this.setState({
+                messages: newMessages
+              });
+            }
+
+          })
+          .catch((error) => {
+            console.log(error)
+            Alert.alert('Error', 'Promise rejection error')
+          });
+          }, 5000);
     }
   
     onSend(messages = []) {
