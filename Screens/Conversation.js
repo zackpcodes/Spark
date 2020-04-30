@@ -67,7 +67,8 @@ export default class Conversation extends Component {
           },
           body: JSON.stringify({
             message_type: 'text',
-            content: messages[0].text
+            content: messages[0].text,
+            cuuid: global.curConversation.cuuid
           }),
         }).then((response) => response.json())
           .then((responseJson) => {
