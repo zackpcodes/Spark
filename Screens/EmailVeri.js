@@ -80,7 +80,6 @@ export default class EmailVeri extends Component {
               onChangeText={(email) => this.setState({ email })}
               value={this.state.email}
             />
-  
             <TouchableOpacity style={stylesForReg.touchButton} onPress={() => this.emailVeriRequest()}>
               <Text style={{ fontSize: 19, padding: 17 }}>Continue</Text>
             </TouchableOpacity>

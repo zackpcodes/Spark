@@ -34,7 +34,11 @@ export default class VeriScreen extends Component {
           .then((responseJson) => {
             console.log(responseJson)
             if (responseJson.status == 200){
-              this.props.navigation.replace('ProfileSetup')
+              if (responseJson.content.name == null){
+                this.props.navigation.replace('ProfileSetup')
+              }else{
+                this.props.navigation.replace('Convos')
+              }
             }else{
               Alert.alert('Invalid', 'Invalid verification code, please check the code and try again.')
             }

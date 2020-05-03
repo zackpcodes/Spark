@@ -23,6 +23,7 @@ export default class Conversation extends Component {
   }
 
   componentDidMount() {
+
     global.beforeCheckingNotifications = this.state.messages;
 
     this.setState({
@@ -30,10 +31,7 @@ export default class Conversation extends Component {
     })
 
 
-    setInterval(() => {
-
-      var newMessages;
-
+    this.refresh = setInterval(() => {
       fetch('http://spark.pemery.co/chat/get/', {
         method: 'POST',
         headers: {
@@ -45,36 +43,42 @@ export default class Conversation extends Component {
         }),
       }).then((response) => response.json())
         .then((responseJson) => {
-
+          console.log(responseJson)
           if (responseJson.status == 200) {
-            let tempMessageArray = []
-            for (let i = 0; i < responseJson.content.messages; ++i) {
-              tempMessageArray.push({
-                _id: uuidv4(),
-                text: responseJson.content.messages[i].content,
-                createdAt: responseJson.content.messages[i].message_sent,
-                user: {
-                  _id: responseJson.content.messages[i].sender,
-                }
-              });
+            this.setState({ messages: [] });
+
+            for (let i = 0; i < responseJson.content.messages.length; ++i) {
+
+              this.setState(previousState => ({
+                messages: GiftedChat.append(previousState.messages, {
+                  _id: uuidv4(),
+                  text: responseJson.content.messages[i].content,
+                  createdAt: responseJson.content.messages[i].message_sent,
+                  user: {
+                    _id: responseJson.content.messages[i].sender,
+                  }
+                }),
+              }));
+
             }
+
           }
-          if (messages.length != tempMessageArray.length) {
-            this.setState({
-              messages: tempMessageArray,
-            });
-          }
+
 
         })
         .catch((error) => {
           console.log(error)
           Alert.alert('Error', 'Promise rejection error')
         });
-    }, 5000);
+
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refresh);
   }
 
   convertToGifted(messsagesToConvert) {
-
     converted = []
     converted.push({
       _id: 1,
@@ -103,12 +107,12 @@ export default class Conversation extends Component {
 
   onSend(messages = []) {
 
+    
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }));
 
     // There needs to be a call here to post the new message to the server
-
     fetch('http://spark.pemery.co/chat/send', {
       method: 'POST',
       headers: {
@@ -123,9 +127,7 @@ export default class Conversation extends Component {
     }).then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.status == 200) {
-          console.log("Sent successfully");
-          console.log("Message that was sent: ");
-          console.log(messages[0])
+          // console.log(messages[0])
         } else {
           console.log("Send message failed");
         }
@@ -141,7 +143,6 @@ export default class Conversation extends Component {
   backToConvos = () => {
     curConversation.messages = this.state.messages
     this.props.navigation.navigate('Convos')
-
   }
 
   renderBubble(props) {
@@ -150,9 +151,11 @@ export default class Conversation extends Component {
         {...props}
         wrapperStyle={{
           right: {
+            padding: 3,
             backgroundColor: '#1985a1'
           },
           left: {
+            padding: 3,
             backgroundColor: '#c5c3c6'
           },
         }}
@@ -163,7 +166,7 @@ export default class Conversation extends Component {
   render() {
     return (
       <View style={{ flex: 1, }}>
-        <View style={{ alignItems: 'center', padding: 0, justifyContent: 'space-between', flexDirection: 'row', marginTop: Constants.statusBarHeight, }}>
+        <View style={{ alignItems: 'center', padding: 5, justifyContent: 'space-between', flexDirection: 'row', marginTop: Constants.statusBarHeight, }}>
           <TouchableOpacity onPress={this.backToConvos} style={{ alignContent: 'center', marginLeft: 10, }}>
             <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#1985a1' }}>&lt;</Text>
           </TouchableOpacity>
@@ -184,10 +187,10 @@ export default class Conversation extends Component {
         <GiftedChat
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
-          // user={{
           renderAvatar={null}
-          // _id: 1,
-          // }}
+          user={{
+          _id: global.curUserUUID,
+          }}
           renderBubble={this.renderBubble}
         />
 

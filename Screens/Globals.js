@@ -5,6 +5,7 @@ global.userProfilePic = null
 global.contacts = []
 global.conversations = []
 global.curConversation = null
+global.curUserUUID = null
 global.refreshBy = null
 global.isLoggedIn = null
 global.counter = 1

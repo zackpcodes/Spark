@@ -19,7 +19,7 @@ global.stylesForReg = StyleSheet.create({
       padding: 10,
       width: 290,
       fontSize: 17,
-      marginTop: 10,
+      marginTop: 30,
   
     },
     touchButton: {
@@ -28,7 +28,7 @@ global.stylesForReg = StyleSheet.create({
       width: 290,
       height: 65,
       marginTop: 30,
-      marginBottom: 50,
+      marginBottom: 10,
       borderRadius: 2,
       opacity: 0.7,
     },

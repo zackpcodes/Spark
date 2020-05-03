@@ -24,7 +24,7 @@ export default class ConvosFeed extends Component {
 
 
   componentDidMount() {
-    
+
     fetch('http://spark.pemery.co/chat/active/', {
       method: 'POST',
       headers: {
@@ -55,7 +55,7 @@ export default class ConvosFeed extends Component {
           }).then((response) => response.json())
             .then((responseJson) => {
               if (responseJson.status == 200) {
-                this.setState({CONVOS: []});
+                this.setState({ CONVOS: [] });
                 return responseJson
               } else {
                 Alert.alert('Error', responseJson.content.comment)
@@ -70,7 +70,7 @@ export default class ConvosFeed extends Component {
 
         Promise.all(promises).then(response => {
           let promises2 = []
-          
+
           for (let i = 0; i < response.length; ++i) {
             promises2.push(fetch('http://spark.pemery.co/account/search/', {
               method: 'POST',
@@ -84,7 +84,7 @@ export default class ConvosFeed extends Component {
             }).then((response) => response.json())
               .then((responseJson) => {
                 if (responseJson.status == 200) {
-                  this.state.CONVOS.push({ cuuid: response[i].content.cuuid, uuid: response[i].content.members[1], name: responseJson.content.name, email_phone: responseJson.content.email_phone, messages: [], counter: 0});
+                  this.state.CONVOS.push({ cuuid: response[i].content.cuuid, uuid: response[i].content.members[1], name: responseJson.content.name, email_phone: responseJson.content.email_phone, messages: [], counter: 0 });
                   this.setState(this.state);
 
                 } else {
@@ -195,7 +195,7 @@ export default class ConvosFeed extends Component {
                 .then((responseJson2) => {
                   if (responseJson2.status == 200) {
 
-                    this.state.CONVOS.push({ cuuid: responseJson.content.cuuid, uuid: responseJson.content.uuid, name: responseJson2.content.name, email_phone: item.email_phone, messages: [], counter: 0});
+                    this.state.CONVOS.push({ cuuid: responseJson.content.cuuid, uuid: responseJson.content.uuid, name: responseJson2.content.name, email_phone: item.email_phone, messages: [], counter: 0 });
                     this.setState(this.state);
                     this.refs.modal2.close();
 
@@ -234,7 +234,8 @@ export default class ConvosFeed extends Component {
 
 
 
-  searchForContact = email => {
+  addContact = email => {
+
     fetch('http://spark.pemery.co/account/search/', {
       method: 'POST',
       headers: {
@@ -245,172 +246,182 @@ export default class ConvosFeed extends Component {
         email_phone: email,
       }),
     }).then((response) => response.json())
-      .then((responseJson) => {
-        if (responseJson.status == 200) {
-          this.setState({emailSearchResult: responseJson})
-        } else {
-          Alert.alert('Error', responseJson.content.comment)
-          this.props.navigation.replace('Email')
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-        Alert.alert('Error', 'Promise rejection error')
-      });
-  }
+      .then((responseJson1) => {
+        if (responseJson1.status == 200) {
 
-
-  addContact = () => {
-
-    console.log(this.state.emailSearchResult)
-
-    fetch('http://spark.pemery.co/account/', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => response.json())
-      .then((responseJson) => {
-        if (responseJson.status == 200) {
-          fetch('http://spark.pemery.co/account/modify/', {
+          fetch('http://spark.pemery.co/account/', {
             method: 'POST',
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              email_phone: this.state.emailSearchResult,
-            }),
           }).then((response) => response.json())
             .then((responseJson2) => {
               if (responseJson2.status == 200) {
+                contactsTemp = JSON.parse(responseJson2.content.contacts);
+                var flag = false;
+                for (let i = 0; i < contactsTemp.length; ++i) {
+                  if (contactsTemp[i].uuid == responseJson1.uuid) {
+                    flag = true;
+                  }
+                }
+                if (!flag) {
+                  contactsTemp.push({ email_phone: responseJson1.content.email_phone, uuid: responseJson1.content.uuid, picture_id: responseJson1.content.picture_id, name: responseJson1.content.name })
 
-              } else {
-                Alert.alert('Error', responseJson2.content.comment)
-                this.props.navigation.replace('Email')
-              }
-            })
+                  fetch('http://spark.pemery.co/account/modify/', {
+                    method: 'POST',
+                    headers: {
+                      Accept: 'application/json',
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      contacts: contactsTemp,
+                    }),
+                  }).then((response) => response.json())
+                    .then((responseJson3) => {
+                      if (responseJson3.status == 202) {
+
+                        Alert.alert('Success.', 'Contact successfully added!')
+                        this.refs.model1.close();
+                        this.refs.model2.open();
+                      } else {
+                        Alert.alert('Error', responseJson3.content.comment)
+                      }
+                    })
+                    .catch((error) => {
+                      console.log(error)
+                      Alert.alert('Error', 'Promise rejection error')
+                    });
+
+
+                  }else{
+                    Alert.alert('Failed.', 'Contact already exists')
+                  }
+                } else {
+                  Alert.alert('Error', responseJson2.content.comment)
+                  this.props.navigation.replace('Email')
+                }
+              
+              })
             .catch((error) => {
               console.log(error)
               Alert.alert('Error', 'Promise rejection error')
             });
-        } else {
-          Alert.alert('Error', responseJson.content.comment)
+
+      } else {
+        Alert.alert('Error', responseJson1.content.comment)
           this.props.navigation.replace('Email')
-        }
+      }
       })
       .catch((error) => {
-        console.log(error)
-        Alert.alert('Error', 'Promise rejection error')
-      });
+  console.log(error)
+  Alert.alert('Error', 'Promise rejection error')
+});
 
-    
+
+
   }
 
 
-  render() {
-    return (
+render() {
+  return (
 
-      <SafeAreaView>
-        <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false} position={"top"} ref={"modal1"}>
-          <View>
-            <Text style={{ padding: 20, fontSize: 20, }}>New Contact</Text>
-          </View>
-          <View style={{ width: '100%', }}>
-            <TextInput
-              style={{ height: 50, borderColor: 'gray', borderWidth: .2, textAlign: "center", fontSize: 15, borderRadius: 10, }}
-              onChangeText={text => this.setState({ emailToSearch: text })}
-              placeholder='Enter email to search'
+    <SafeAreaView>
+      <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false} position={"top"} ref={"modal1"}>
+        <View>
+          <Text style={{ padding: 20, fontSize: 20, }}>New Contact</Text>
+        </View>
+        <View style={{ width: '100%', }}>
+          <TextInput
+            style={{ height: 50, borderColor: 'gray', borderWidth: .2, textAlign: "center", fontSize: 15, borderRadius: 10, }}
+            onChangeText={text => this.setState({ emailToSearch: text })}
+            placeholder='Email to add...'
+          />
+          <TouchableOpacity style={stylesForConvos.addContact} onPress={() => this.addContact(this.state.emailToSearch)} >
+            <Text style={{ fontSize: 19, padding: 17 }}>Add Contact</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+
+      <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false} position={"top"} ref={"modal2"}>
+        <View>
+          <Text style={{ padding: 20, fontSize: 20, }}>New Conversation</Text>
+        </View>
+        <View style={{ width: '100%', }}>
+          <TextInput
+            style={{ height: 50, borderColor: 'gray', borderWidth: .2, textAlign: "center", fontSize: 15, borderRadius: 10, }}
+            onChangeText={text => this.updateSearch(text)}
+            placeholder='Find Contact...'
+          />
+        </View>
+
+        <View style={stylesForConvos.contactsList}>
+          <FlatList
+            data={this.state.contactsOrigin}
+            renderItem={({ item }) => (
+              <ListItem
+                roundAvatar
+                title={item.name}
+                leftAvatar={{ source: { uri: 'https://placeimg.com/140/140/any' } }}
+                onPress={() => { this.startConvo(item) }}
+                bottomDivider
+              />
+            )}
+            keyExtractor={item => item.uuid}
+          />
+        </View>
+        <TouchableOpacity style={stylesForConvos.addContact} onPress={() => { this.refs.modal2.close(); this.refs.modal1.open() }} >
+          <Text style={{ fontSize: 19, padding: 17 }}>Add Contact</Text>
+        </TouchableOpacity>
+      </Modal>
+
+
+      <View style={stylesForConvos.convoScreen}>
+        <View style={{ alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate('ProfileUpdate')} >
+            <Image source={{ uri: global.userProfilepic }} style={stylesForConvos.profileMenuButton} />
+          </TouchableOpacity>
+
+          <Image
+            style={{ width: 40, height: 40, }}
+            source={require('./MainLogo.png')}
+          />
+
+          <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')} style={{ alignContent: 'center' }}>
+            <Image
+              style={{ width: 40, height: 40, }}
+              source={require('./SettingsBtn.png')}
             />
-            <TouchableOpacity onPress={() => this.searchForContact(this.state.emailToSearch)} >
-              <Text style={{ fontSize: 19, padding: 17 }}>Search</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.addContact()} >
-              <Text style={{ fontSize: 19, padding: 17 }}>Add Contact</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-
-
-        <Modal style={[stylesForConvos.modal, stylesForConvos.modal2]} backdrop={false} position={"top"} ref={"modal2"}>
-          <View>
-            <Text style={{ padding: 20, fontSize: 20, }}>New Conversation</Text>
-          </View>
-          <View style={{ width: '100%', }}>
-            <TextInput
-              style={{ height: 50, borderColor: 'gray', borderWidth: .2, textAlign: "center", fontSize: 15, borderRadius: 10, }}
-              onChangeText={text => this.updateSearch(text)}
-              placeholder='Find Contact...'
-            />
-          </View>
-          
-          <View style={stylesForConvos.contactsList}>
-            <FlatList
-              data={this.state.contactsOrigin}
-              renderItem={({ item }) => (
+          </TouchableOpacity>
+        </View>
+        <View style={stylesForConvos.convoList}>
+          <FlatList
+            data={this.state.CONVOS}
+            renderItem={({ item }) => (
+              <View>
                 <ListItem
                   roundAvatar
                   title={item.name}
                   leftAvatar={{ source: { uri: 'https://placeimg.com/140/140/any' } }}
-                  onPress={() => { this.startConvo(item) }}
+                  containerStyle={{ borderBottomWidth: 0 }}
+                  onPress={() => { this.openChat(item) }}
+                  chevron
                   bottomDivider
                 />
-              )}
-              keyExtractor={item => item.uuid}
-            />
-          </View>
-          <TouchableOpacity style={stylesForConvos.addContact} onPress={() => this.refs.modal1.open()} >
-              <Text style={{ fontSize: 19, padding: 17 }}>Add Contact</Text>
-          </TouchableOpacity>
-        </Modal>
-
-
-        <View style={stylesForConvos.convoScreen}>
-          <View style={{ alignItems: 'center', padding: 10, justifyContent: 'space-between', flexDirection: 'row' }}>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('ProfileUpdate')} >
-              <Image source={{ uri: global.userProfilepic }} style={stylesForConvos.profileMenuButton} />
-            </TouchableOpacity>
-
-            <Image
-              style={{ width: 40, height: 40, }}
-              source={require('./MainLogo.png')}
-            />
-
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')} style={{ alignContent: 'center' }}>
-              <Image
-                style={{ width: 40, height: 40, }}
-                source={require('./SettingsBtn.png')}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={stylesForConvos.convoList}>
-            <FlatList
-              data={this.state.CONVOS}
-              renderItem={({ item }) => (
-                <View>
-                  <ListItem
-                    roundAvatar
-                    title={item.name}
-                    leftAvatar={{ source: { uri: 'https://placeimg.com/140/140/any' } }}
-                    containerStyle={{ borderBottomWidth: 0 }}
-                    onPress={() => { this.openChat(item) }}
-                    chevron
-                    bottomDivider
-                  />
-                  <Divider style={{ backgroundColor: 'black' }} />
-                </View>
-              )}
-              keyExtractor={item => item.cuuid}
-            />
-          </View>
-          <View style={stylesForConvos.startConvoButton}>
-            <TouchableOpacity onPress={this.openContacts}>
-              <Text style={{ fontSize: 35, paddingTop: 7, }}>+</Text>
-            </TouchableOpacity>
-          </View>
+                <Divider style={{ backgroundColor: 'black' }} />
+              </View>
+            )}
+            keyExtractor={item => item.cuuid}
+          />
         </View>
-      </SafeAreaView>
-    );
-  }
+        <View style={stylesForConvos.startConvoButton}>
+          <TouchableOpacity onPress={this.openContacts}>
+            <Text style={{ fontSize: 35, paddingTop: 7, }}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
 }

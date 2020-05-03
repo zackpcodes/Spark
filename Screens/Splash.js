@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Alert, View } from 'react-native';
 
-
+import './Globals'
 
 export default class Splash extends Component {
 
@@ -20,8 +20,9 @@ export default class Splash extends Component {
             },
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson)
                 if (responseJson.status == 200) {
+                    console.log(responseJson)
+                    global.curUserUUID = responseJson.content.uuid;
                     this.props.navigation.replace('Convos')
                 } else {
                     this.props.navigation.replace('Email')
