@@ -20,7 +20,7 @@ export default class ProfileSetup extends Component {
       };
     }
 
-  
+    // profilePush: Sends info for a new user to the server to be stored.
     profilePush = () => {
       fetch('http://spark.pemery.co/account/modify', {
           method: 'POST',

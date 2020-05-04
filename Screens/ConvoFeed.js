@@ -8,7 +8,8 @@ import { ListItem, Divider } from 'react-native-elements';
 import './styles';
 import './Globals'
 
-
+// ConvosFeed allows the user to add conversations via their contacts modal
+// this component also allows the user to add new contacts.
 export default class ConvosFeed extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +23,7 @@ export default class ConvosFeed extends Component {
     };
   }
 
-
+  // Loads all current conversations each time the component mounts.
   componentDidMount() {
 
     fetch('http://spark.pemery.co/chat/active/', {
@@ -109,7 +110,8 @@ export default class ConvosFeed extends Component {
 
   }
 
-
+  // Sorts and searches contacts when a user searches for a contact
+  // from the contact modal pop up.
   updateSearch = text => {
     /*const searchData = this.state.contactsOrigin.filter(item => {
       const itemData = item.email_phone.toUpperCase();
@@ -120,7 +122,8 @@ export default class ConvosFeed extends Component {
   };
 
 
-
+  // openContacts loads your contacts from the server and opens a model
+  // where the user can select a contact to start a conversation with.
   openContacts = () => {
     this.updateSearch('')
     fetch('http://spark.pemery.co/account/modify', {
@@ -150,7 +153,7 @@ export default class ConvosFeed extends Component {
 
   };
 
-
+  // startConvo: When the user taps on a contact from the contact list this function is called.
   startConvo = item => {
 
     fetch('http://spark.pemery.co/chat/create', {
@@ -226,14 +229,15 @@ export default class ConvosFeed extends Component {
 
   };
 
-
+  // openChat: sets opened chat to the current chat being viewed.
   openChat = item => {
     global.curConversation = item;
     this.props.navigation.navigate('IndividualConvo');
   };
 
 
-
+  // addContact: searches for user information and adds this information
+  // to contacts list.
   addContact = email => {
     fetch('http://spark.pemery.co/account/search/', {
       method: 'POST',

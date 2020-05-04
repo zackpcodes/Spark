@@ -18,7 +18,8 @@ export default class VeriScreen extends Component {
       };
     }
   
-  
+    // codeVeriRequest submits verification code and email to the spark 
+    // server for verification.
     codeVeriRequest = () => {
         fetch('http://spark.pemery.co/account/verify', {
           method: 'POST',

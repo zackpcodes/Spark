@@ -6,6 +6,7 @@ import Constants from 'expo-constants';
 
 import './Globals'
 
+// Generic function for generating unique ID's
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -13,6 +14,8 @@ function uuidv4() {
   });
 }
 
+// The Conversation component represents an individual conversation,
+// allowing the user to send a receieve messages.
 export default class Conversation extends Component {
   constructor(props) {
     super(props);
@@ -31,7 +34,7 @@ export default class Conversation extends Component {
     })
 
     
-
+    // refresh is a function which checks for new messages from the server.
     this.refresh = setInterval(() => {
       fetch('http://spark.pemery.co/chat/get/', {
         method: 'POST',
@@ -79,33 +82,9 @@ export default class Conversation extends Component {
     clearInterval(this.refresh);
   }
 
-  convertToGifted(messsagesToConvert) {
-    converted = []
-    converted.push({
-      _id: 1,
-      text: 'My message',
-      createdAt: new Date(Date.UTC(2016, 5, 11, 17, 20, 0)),
-      user: {
-        _id: 2,
-        name: 'React Native',
-      },
-    })
 
-    for (let i = 0; i < messsagesToConvert.length; i++) {
-      converted.push(
-        {
-          _id: uuidv4(),
-          text: messagesToConvert[i].content,
-          createdAt: messagesToConvert[i].message_sent,
-          user: {
-            _id: messsagesToConvert[i].sender,
-          },
-        }
-      );
-    }
-    return converted;
-  }
-
+  // onSend formats and sends a messsage to the server and also adds
+  // the message to the current conversation.
   onSend(messages = []) {
 
     
@@ -113,7 +92,6 @@ export default class Conversation extends Component {
       messages: GiftedChat.append(previousState.messages, messages),
     }));
 
-    // There needs to be a call here to post the new message to the server
     fetch('http://spark.pemery.co/chat/send', {
       method: 'POST',
       headers: {
@@ -141,11 +119,15 @@ export default class Conversation extends Component {
 
   }
 
+  // Navigating back to the main conversation screen.
   backToConvos = () => {
     curConversation.messages = this.state.messages
     this.props.navigation.navigate('Convos')
   }
 
+  // This is the individual bubbles containing the messages.
+  // Returns a updated bubble render to make them consistent
+  // with our style.
   renderBubble(props) {
     return (
       <Bubble

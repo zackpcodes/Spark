@@ -3,6 +3,8 @@ import { Alert, View } from 'react-native';
 
 import './Globals'
 
+// The Splash component allows us to check to see if the user is logged in
+// or not based on the server response.
 export default class Splash extends Component {
 
     constructor(props) {
@@ -10,7 +12,8 @@ export default class Splash extends Component {
         this.authenticateSession();
     }
 
-
+    // authenticateSession: Allows for the login verification of a user
+    // upon loading of the application.
     authenticateSession() {
         fetch('http://spark.pemery.co/account', {
             method: 'POST',

@@ -15,6 +15,7 @@ export default class ProfileSetup extends Component {
       };
     }
 
+    // settingPush: push updated user settings and return to Convos screen.
     settingsPush = () => {
 
         this.props.navigation.replace('Convos')

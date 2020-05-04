@@ -17,7 +17,7 @@ export default class EmailVeri extends Component {
       };
     }
   
-
+    // validateEmail: returns true if the inputed email is a validate email or not.
     validateEmail = (text) => {
       console.log(text);
       let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -31,7 +31,8 @@ export default class EmailVeri extends Component {
       }
     }
   
-  
+    // emailVeriRequest: Submits entered email to the server to request a 
+    // verification code.
     emailVeriRequest = () => {
       global.email_phone = this.state.email
       if (this.validateEmail(this.state.email)) {

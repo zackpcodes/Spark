@@ -21,7 +21,6 @@ export default class ProfileUpdate extends Component {
     }
 
     profilePush = () => {
-        // Make api call here to 
         this.props.navigation.replace('Convos')
     }
 
