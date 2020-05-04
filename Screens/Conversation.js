@@ -71,7 +71,7 @@ export default class Conversation extends Component {
           Alert.alert('Error', 'Promise rejection error')
         });
 
-    }, 1000);
+    }, 500);
   }
 
   componentWillUnmount() {

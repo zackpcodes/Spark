@@ -111,12 +111,12 @@ export default class ConvosFeed extends Component {
 
 
   updateSearch = text => {
-    const searchData = this.state.contactsOrigin.filter(item => {
+    /*const searchData = this.state.contactsOrigin.filter(item => {
       const itemData = item.email_phone.toUpperCase();
       const textData = text.toUpperCase();
       return itemData.indexOf(textData) > -1;
     });
-    this.setState({ CONTACTS: searchData });
+    this.setState({ CONTACTS: searchData });*/
   };
 
 
@@ -235,7 +235,7 @@ export default class ConvosFeed extends Component {
 
 
   addContact = email => {
-
+    const self = this;
     fetch('http://spark.pemery.co/account/search/', {
       method: 'POST',
       headers: {
@@ -258,14 +258,20 @@ export default class ConvosFeed extends Component {
           }).then((response) => response.json())
             .then((responseJson2) => {
               if (responseJson2.status == 200) {
-                contactsTemp = JSON.parse(responseJson2.content.contacts);
                 var flag = false;
-                for (let i = 0; i < contactsTemp.length; ++i) {
-                  if (contactsTemp[i].uuid == responseJson1.uuid) {
-                    flag = true;
+
+                if(responseJson2.content.contacts != null){
+                  var contactsTemp = JSON.parse(responseJson2.content.contacts);
+                  
+                  for (let i = 0; i < contactsTemp.length; ++i) {
+                    if (contactsTemp[i].uuid == responseJson1.uuid) {
+                      flag = true;
+                    }
                   }
                 }
+                
                 if (!flag) {
+                  var contactsTemp = [];
                   contactsTemp.push({ email_phone: responseJson1.content.email_phone, uuid: responseJson1.content.uuid, picture_id: responseJson1.content.picture_id, name: responseJson1.content.name })
 
                   fetch('http://spark.pemery.co/account/modify/', {
