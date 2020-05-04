@@ -235,7 +235,6 @@ export default class ConvosFeed extends Component {
 
 
   addContact = email => {
-    const self = this;
     fetch('http://spark.pemery.co/account/search/', {
       method: 'POST',
       headers: {

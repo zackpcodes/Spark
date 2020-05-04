@@ -30,6 +30,7 @@ export default class Conversation extends Component {
       title: curConversation.name
     })
 
+    
 
     this.refresh = setInterval(() => {
       fetch('http://spark.pemery.co/chat/get/', {
