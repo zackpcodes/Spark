@@ -16,7 +16,7 @@
     "eslint-config-airbnb-base": "^14.1.0",
     "expo": "~36.0.0",
     "expo-image-picker": "^8.0.2",
-    "jest-cli": "^25.3.0",
+    "jest-cli": "^30.0.4",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
@@ -44,7 +44,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.0",
-    "jest-expo": "^37.0.0",
+    "jest-expo": "^53.0.9",
     "react-native-testing-library": "^1.13.0",
     "react-test-renderer": "^16.13.1"
   },
